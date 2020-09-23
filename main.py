@@ -70,8 +70,8 @@ def bfs():
         continue
       # if( visited[new_x][new_y] == True ):
       #   continue
-      if(wall_count[new_x][new_y] == INF): # 핵심부분. 오로지 INF일때만 체크한다.
-      # if(wall_count[new_x][new_y] > wall_count[x][y]):
+      
+      if(wall_count[new_x][new_y] > wall_count[x][y]):
         if(board[new_x][new_y] == 1):  
             wall_count[new_x][new_y] = wall_count[x][y] + 1
         else:
