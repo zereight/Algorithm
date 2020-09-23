@@ -1,90 +1,83 @@
 '''
-문제
-N개의 숫자로 구분된 각각의 마을에 한 명의 학생이 살고 있다.
+미로는 N*M 크기이며, 
+미로는 빈 방 또는 벽으로 이루어져 있고, 빈 방은 자유롭게 다닐 수 있지만, 
+벽은 부수지 않으면 이동할 수 없다.
 
-어느 날 이 N명의 학생이 X (1 ≤ X ≤ N)번 마을에 모여서 파티를 벌이기로 했다. 
-이 마을 사이에는 총 M개의 단방향 도로들이 있고 i번째 길을 지나는데 Ti(1 ≤ Ti ≤ 100)의 시간을 소비한다.
+알고스팟 운영진은 여러명이지만, 항상 모두 같은 방에 있어야 한다. 즉, 여러 명이 다른 방에 있을 수는 없다. 어떤 방에서 이동할 수 있는 방은 상하좌우로 인접한 빈 방이다. 
+즉, 현재 운영진이 (x, y)에 있을 때, 이동할 수 있는 방은 (x+1, y), (x, y+1), (x-1, y), (x, y-1) 이다. 단, 미로의 밖으로 이동 할 수는 없다.
 
-각각의 학생들은 파티에 참석하기 위해 걸어가서 다시 그들의 마을로 돌아와야 한다. 하지만 이 학생들은 워낙 게을러서 최단 시간에 오고 가기를 원한다.
+벽은 평소에는 이동할 수 없지만, 알고스팟의 무기 AOJ를 이용해 벽을 부수어 버릴 수 있다. 벽을 부수면, 빈 방과 동일한 방으로 변한다.
 
-이 도로들은 단방향이기 때문에 아마 그들이 오고 가는 길이 다를지도 모른다. N명의 학생들 중 오고 가는데 가장 많은 시간을 소비하는 학생은 누구일지 구하여라.
+현재 (1, 1)에 있는 알고스팟 운영진이 (N, M)으로 이동하려면 
+벽을 최소 몇 개 부수어야 하는지 구하는 프로그램을 작성하시오.
 
 입력
-첫째 줄에 N(1 ≤ N ≤ 1,000), M(1 ≤ M ≤ 10,000), X가 공백으로 구분되어 입력된다. 두 번째 줄부터 M+1번째 줄까지 i번째 도로의 시작점, 끝점, 그리고 이 도로를 지나는데 필요한 소요시간 Ti가 들어온다. 시작점과 끝점이 같은 도로는 없으며, 시작점과 한 도시 A에서 다른 도시 B로 가는 도로의 개수는 최대 1개이다.
+첫째 줄에 미로의 크기를 나타내는 가로 크기 M, 세로 크기 N (1 ≤ N, M ≤ 100)이 주어진다. 다음 N개의 줄에는 미로의 상태를 나타내는 숫자 0과 1이 주어진다. 0은 빈 방을 의미하고, 1은 벽을 의미한다.
 
-모든 학생들은 집에서 X에 갈수 있고, X에서 집으로 돌아올 수 있는 데이터만 입력으로 주어진다.
+(1, 1)과 (N, M)은 항상 뚫려있다.
 
 출력
-첫 번째 줄에 N명의 학생들 중 오고 가는데 가장 오래 걸리는 학생의 소요시간을 출력한다.
+첫째 줄에 알고스팟 운영진이 (N, M)으로 이동하기 위해 벽을 최소 몇 개 부수어야 하는지 출력한다.
 
-4 8 2
-1 2 4
-1 3 2
-1 4 7
-2 1 1
-2 3 5
-3 1 2
-3 4 4
-4 2 3
+4 2
+0001
+1000
 '''
 import sys
 import heapq
+
 input = sys.stdin.readline
-N, M, X = map(int, input().split(" "))
-lines = dict()
-for i in range(N+1):
-  lines[i] = []
+M,N = map(int, input().split(" "))
+board = []
+for _ in range(N):
+  board.append( list( map( int,list( input().rstrip() ) ) ) )
 
-for _ in range(M):
-  start,end,weight = map(int, input().split(" "))
-  lines[start].append( (end, weight) )
+INF = int(1e9)
+wall_count = [ [INF]*M for _ in range(N) ]
+wall_count[0][0] = 0
+visited = [ [False]*M for _ in range(N) ]
 
-# 각각의 모든 노드가 시작점일때의 다익스트라 distance
-all_distances = dict()
-for i in range(N+1):
-  all_distances[i] = None
+# 상하좌우
+direction_x = [-1, 1, 0, 0]
+direction_y = [0,0,-1,1]
 
-def dijkstra():
-  global N
-  global all_distances
-  global lines
-  global X
-  INF = int(1e9)
+def print_matrix(b):
+  print("#######################")
+  for i in b:
+    print(i)
+  print("#######################")
+
+def bfs():
+  global N,M,visited, direction_x, direction_y, wall_count, board
+  q = []
+  # 시간초과나서 wall작은것부터 뽑는 우선순위 큐 사용
+  heapq.heappush(q, (wall_count[0][0],0,0))
   
-
-  for start in range(1,N+1):
-    distance = [INF] * (N+1)
-    distance[start] = 0
-    visited = [False] * (N+1)
-    q = [] # [(weight, destination)]
-
-    heapq.heappush(q, (0, start))
-
-    while( len(q) > 0 ):
-      smallest_dist, smallest_node = heapq.heappop(q)
-      visited[smallest_node] = True # 방문처리
-      for node in lines[smallest_node]:
-        dest, weight = node
-
-        if( visited[dest] == True ): 
-          continue
-        
-        if( (smallest_dist + weight) < distance[dest]):
-          distance[dest] = smallest_dist + weight
-          heapq.heappush(q, (distance[dest], dest))
-
-
-    all_distances[start] = list(distance)
-
-  # X 입장에서 모든 경로로 가는 최단거리
-  ans = []
-  for i in range(1, N+1):
+  
+  while(len(q)>0):
+    wall,x,y = heapq.heappop(q)
     
-    a = all_distances[i][X] # i입장에서 X까지 최단거리
-    b = all_distances[X][i] # X입장에서 i까지 최단거리
-    ans.append(a+b)
+    # print_matrix(wall_count)
+    # visited[x][y] = True
+    # if(x==N-1 and y==M-1):
+    #   break
+    
+    for i in range(4):
+      new_x = x+direction_x[i]
+      new_y = y+direction_y[i]
 
-  return max(ans)
+      if( new_x<0 or new_y<0 or new_x>N-1 or new_y>M-1 ):
+        continue
+      # if( visited[new_x][new_y] == True ):
+      #   continue
+      if(wall_count[new_x][new_y] == INF): # 핵심부분. 오로지 INF일때만 체크한다.
+      # if(wall_count[new_x][new_y] > wall_count[x][y]):
+        if(board[new_x][new_y] == 1):  
+            wall_count[new_x][new_y] = wall_count[x][y] + 1
+        else:
+            wall_count[new_x][new_y] = wall_count[x][y]
+        heapq.heappush(q, (wall_count[new_x][new_y], new_x, new_y))
 
+  return wall_count[N-1][M-1]
 
-print(dijkstra())
+print(bfs())
