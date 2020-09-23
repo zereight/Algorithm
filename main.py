@@ -18,61 +18,55 @@
 3 4 6
 '''
 import sys
+import heapq
 input = sys.stdin.readline
+V, E = map(int, input().split(" "))
 
-V,E = map(int, input().split(" "))
-k = int(input())
+start = int(input())
+
 lines = dict()
-for i in range(0,V+1):
+for i in range(V+1):
   lines[i] = []
 
-INF = int(1e9)
-for _ in range( E ):
-  u, v, w = map(int, input().split(" "))
+for _ in range(E):
+  u,v,w = map(int, input().split(" "))
   lines[u].append( (v,w) )
-  
+
+visited = [False]*(V+1)
+INF = int(1e9)
+
+# start에서 i까지의 거리
 distance = [INF] * (V+1)
-visited = [0] * (V+1)
 
-visited[k] = 1
-distance[k] = 0
-# 처음 distance 초기화
-for i in lines[k]:
-  distance[i[0]] = i[1]
-
-
-def find_nearest_node():
-  global distance
-  global V
-  min_value = INF
-  min_index = 0
-  for i in range(1, V+1):
-    if( distance[i] < min_value and visited[i]==0 ):
-      min_index = i
-      min_value = distance[i]
-  return min_index
-
-def dijkstra():
-  global distance
+def dijkstra(start):
   global visited
+  global distance
   global lines
-  global V
-
   
-  for _ in range(V+1):
-    nearest_node = find_nearest_node()
-    visited[nearest_node] = 1
-    
-    for i in lines[nearest_node]:
-      dist = distance[ nearest_node ] + i[1]
-      if( dist < distance[i[0]] ):
-        distance[i[0]] = dist
-        visited[i[0]] = 1
+  # 첫 distance 초기화
+  distance[start] = 0
 
-dijkstra()
+  q = []
+  # 처음 우선 순위큐에, (거리, 시작지점)넣기
+  # 자기자신과의 거리는 0이고 낮을 수록 우선순위 큐의 우선이 되기떄문에 순서 바꿈
+  heapq.heappush(q, (0, start))
+
+  while len(q) > 0:
+    smallest_dist_cost, smallest_dist_node = heapq.heappop(q)
+    # 방문처리
+    visited[smallest_dist_node] = True
+    for node in lines[smallest_dist_node]:
+      dest, weight = node
+      if( visited[dest] == True ):
+        continue
+      if( distance[dest] > distance[smallest_dist_node] + weight ):
+        distance[dest] = distance[smallest_dist_node] + weight
+        heapq.heappush(q, (distance[dest], dest))
+
+dijkstra(start)
 
 for i in range(1, len(distance)):
-  if( distance[i]==INF ):
+  if( distance[i] == INF ):
     print("INF")
   else:
     print(distance[i])
