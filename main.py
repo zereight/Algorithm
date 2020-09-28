@@ -1,31 +1,40 @@
-'''
-문제
-가중치 없는 방향 그래프 G가 주어졌을 때, 모든 정점 (i, j)에 대해서, i에서 j로 가는 경로가 있는지 없는지 구하는 프로그램을 작성하시오.
-
-입력
-첫째 줄에 정점의 개수 N (1 ≤ N ≤ 100)이 주어진다. 둘째 줄부터 N개 줄에는 그래프의 인접 행렬이 주어진다. i번째 줄의 j번째 숫자가 1인 경우에는 i에서 j로 가는 간선이 존재한다는 뜻이고, 0인 경우는 없다는 뜻이다. i번째 줄의 i번째 숫자는 항상 0이다.
-
-출력
-총 N개의 줄에 걸쳐서 문제의 정답을 인접행렬 형식으로 출력한다. 정점 i에서 j로 가는 경로가 있으면 i번째 줄의 j번째 숫자를 1로, 없으면 0으로 출력해야 한다.
-'''
-
 import sys
 input = sys.stdin.readline
 
-n = int(input())
-graph = []
-answer = []
-for _ in range(n):
-  graph.append( list(map(int,input().rstrip().split(" ") )))
+n,m = map(int, input().rstrip().split(" "))
+INF = int(1e9)
+graph = [ [INF] * (n+1) for _ in range(n+1) ]
+for _ in range(m):
+  a,b = list(map(int,input().rstrip().split(" ") ))
+  
+  graph[a][b] = 1
+  graph[b][a] = 1
 
-for k in range(n):
-  for i in range(n):
-    for j in range(n):
-      if(graph[i][k]+graph[k][j] == 2 or graph[i][j] != 0):
-        graph[i][j] = 1
 
-# for i in range(n):
-#   answer[i][i] = 1
+for k in range(1, n+1):
+  for i in range(1, n+1):
+    for j in range(1, n+1):
+      graph[i][j] = min([ graph[i][j], graph[i][k]+graph[k][j] ])
 
-for i in graph:
-  print(" ".join( map(str,i) ))
+
+# for i in range(1,n+1):
+#   for j in range(1, n+1):
+#     if(i==j):
+#         graph[i][j] = 0
+#     if(graph[i][j] == INF):
+#       graph[i][j] = 0
+#   print(" ".join( map(str, graph[i][1:]) ) )
+# for i in range(1,n+1):
+#   print(sum(graph[i][1:]))
+
+ans = []
+for i in range(1, n+1):
+  tmp = 0
+  for j in range(1, n+1):
+    if(i==j):
+      graph[i][j] = 0
+    if( graph[i][j] != INF ):
+      tmp += graph[i][j]
+  ans.append( (i, tmp) )
+
+print( sorted(ans, key=lambda x:(-x[1], -x[0]))[-1][0] )
