@@ -1,47 +1,51 @@
 import sys
 input = sys.stdin.readline
 
-from collections import deque
+import heapq
 
-n = int(input().rstrip())
-board = [] # 미로
-dp = [] # 흰방으로 바꾼 개수 누적
+T = int(input())
+
 INF = int(1e9)
-for _ in range(n):
-    board.append( list(map(int,list( input().rstrip() ) ) ) )
-    dp.append( [INF]*n )
-    
 
-def bfs():
-    global n, board, visited, dp
-    # 상하좌우
-    x_direction=[-1,1,0,0]
-    y_direction=[0,0,-1,1]
-    
-    q = deque()
-    q.append((0,0))
-    dp[0][0]=0
-    
-    while(len(q) != 0):
-        
-        x,y = q.popleft()
+def countHacked(arr):
+  return len(list(filter(lambda x: x!=-1, arr)))
 
-        for i in range(4):
-            new_x, new_y = x+x_direction[i], y+y_direction[i]
-            
-            if( new_x >= 0 and new_y>=0 and new_x<n and new_y<n ): # 유효범위 내에 있는지 체크
-                
-                if( board[new_x][new_y] == 0 ): # 검은벽
-                  if(dp[new_x][new_y] > dp[x][y]+1): # 더 큰값이면 이동해서 작게 만들어준다.
-                    dp[new_x][new_y] = dp[x][y]+1
-                    q.append((new_x, new_y))
-                else: # 하얀벽
-                    if(dp[new_x][new_y] > dp[x][y]): # 더 큰값이면 이동해서 작게 만들어준다.
-                        dp[new_x][new_y] = dp[x][y]
-                        q.append((new_x, new_y))
+answer = []
+
+for _ in range(T):
+  n,d,start = map(int, input().rstrip().split(" "))
+  info = dict()
+  visited = [0] * (1+n)
+  distance = [INF] * (1+n)
+
+  for i in range(1, n+1):
+    info[i] = []
+  
+  for __ in range(d):
+    b,a,s = map(int, input().rstrip().split(" "))
+    info[a].append( (b,s) )
+  
+
+  q = []
+  heapq.heappush(q, (0, start))
+  distance[start] = 0
+  
+  while( len(q) != 0 ):
+    weight, curr = heapq.heappop(q)
+    visited[curr] = 1
     
-bfs()
-print(dp[n-1][n-1])
-# for i in dp:
-#   print(" ".join(map(str,i)))
-              
+    for i in info[curr]:
+      dest, cost = i
+      if( visited[dest] == 0 ):
+        if( distance[dest] > weight + cost):
+          distance[dest] = weight+cost
+          heapq.heappush(q, (distance[dest], dest))
+  
+  for i in range(len(distance)):
+    if(distance[i] == INF):
+      distance[i] = -1
+  
+  answer.append( (countHacked(distance), max(distance) ))
+
+for i in answer:
+  print(" ".join(map(str, i)))
