@@ -1,17 +1,20 @@
 import sys
 input = sys.stdin.readline
 
-n,k = map(int, input().rstrip().split(" "))
-
-coins = []
+n = int(input().rstrip())
+info = []
 for _ in range(n):
-  coins.append( int(input().rstrip()) )
+  start, end = map(int, input().rstrip().split(" "))
+  info.append( (start, end) )
 
-cursor = n-1
-answer = 0
-while(k!=0):
-  answer += k//coins[cursor]
-  k -= coins[cursor] * (k//coins[cursor])
-  cursor-=1
+info = sorted(info, key=lambda x: (x[1], x[0]))
 
-print(answer)
+count = 0
+lastest_time = 0
+
+for i in info:
+  if(i[0]>=lastest_time):
+    count+=1
+    lastest_time=i[1]
+
+print(count)
