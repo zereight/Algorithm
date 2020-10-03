@@ -1,25 +1,31 @@
 import sys
 input = sys.stdin.readline
 
-s = input().rstrip() + "!" # !는 문자열 맨마지막 체크용으로 붙여줌.
+T = int(input().rstrip())
 
-tmp = ""
-answer = 0
-minusAppeared = False # 이전에 -가 한번이라도 나오면 그 뒤 모든 값들 다 뺴면 최소값임. 이거 생각해냈으면 천재
-for i in range(len(s)):
-  # -거나 +거나 문자열 마지막일때 체크
-  if( s[i] == "-" or s[i]=="+" or s[i]=="!"):
-    if( not minusAppeared ):
-      answer += int(tmp)
-      tmp=""
-    else:
-      answer -= int(tmp)
-      tmp=""
-    
-    if(s[i] == "-"):
-      minusAppeared = True
+def solve(man):
   
-  else:
-    tmp += s[i]
+  man = sorted(man, key=lambda x: x[0]) # 서류순위 순으로 정렬
+  min_score = man[0][1] # 면접 순위를 기준으로 체크할것임
+  count = 0
+  for m in man:
+    if( m[1] <= min_score ):
+      count += 1
+      min_score = m[1]
+  
+  return count
+    
 
-print(answer)
+answer = []
+for _ in range(T):
+  n = int(input().rstrip())
+
+  man = []
+  for _ in range(n):
+    # 동석차 없음, 순위가 낮을 수록 좋은거임
+    man.append( list(map(int, input().rstrip().split(" ")) ) )
+  
+  answer.append( solve(man) )
+
+for a in answer:
+  print(a)
