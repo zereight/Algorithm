@@ -1,20 +1,25 @@
 import sys
 input = sys.stdin.readline
 
-n = int(input().rstrip())
-info = []
-for _ in range(n):
-  start, end = map(int, input().rstrip().split(" "))
-  info.append( (start, end) )
+s = input().rstrip() + "!" # !는 문자열 맨마지막 체크용으로 붙여줌.
 
-info = sorted(info, key=lambda x: (x[1], x[0]))
+tmp = ""
+answer = 0
+minusAppeared = False # 이전에 -가 한번이라도 나오면 그 뒤 모든 값들 다 뺴면 최소값임. 이거 생각해냈으면 천재
+for i in range(len(s)):
+  # -거나 +거나 문자열 마지막일때 체크
+  if( s[i] == "-" or s[i]=="+" or s[i]=="!"):
+    if( not minusAppeared ):
+      answer += int(tmp)
+      tmp=""
+    else:
+      answer -= int(tmp)
+      tmp=""
+    
+    if(s[i] == "-"):
+      minusAppeared = True
+  
+  else:
+    tmp += s[i]
 
-count = 0
-lastest_time = 0
-
-for i in info:
-  if(i[0]>=lastest_time):
-    count+=1
-    lastest_time=i[1]
-
-print(count)
+print(answer)
