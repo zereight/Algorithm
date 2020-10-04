@@ -1,16 +1,19 @@
 import sys
 input = sys.stdin.readline
 
-T = int(input().rstrip())
+n = int(input())
 
-btns = [300,60,10]
-counts = [0,0,0]
+dp = []
+for _ in range(n+1):
+  dp.append( [0]*(11) )
 
-for i,btn in enumerate(btns):
-  counts[i] += T//btn
-  T = T%btn
+# dp[i][j] i길이의 숫자에서 맨왼쪽숫자가 j일때 개수
 
-if(T==0):
-  print(" ".join(map(str,counts)))
-else:
-  print(-1)
+for i in range(1,11):
+  dp[1][i] = 1
+
+for i in range(2,n+1):
+  for j in range(1,11):
+    dp[i][j] = sum(dp[i-1]) - sum(dp[i-1][:j])
+
+print(sum(dp[n])%10007)
