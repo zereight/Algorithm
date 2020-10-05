@@ -1,45 +1,53 @@
 import sys
 input = sys.stdin.readline
 
-n,m = map(int, input().rstrip().split(" "))
+n = int(input().rstrip())
+answer = 0
+info = []
+for i in range(n):
+  x,y,z = map(int, input().rstrip().split(" "))
+  info.append( (x,y,z,i+1) )
 
 graph = []
-for _ in range(m):
-  a,b,c = map(int, input().rstrip().split(" "))
-  graph.append( (a,b,c) )
-
+# 부모 리스트
 parents = [0] * (n+1)
 
-# 자기자신으로 부모노드 초기화
+# 부모를 자기자신으로 초기화
 for i in range(n+1):
-  parents[i] = i
+  parents[i]=i
 
-# 가중치 기반 정렬
-graph = sorted(graph, key=lambda x:x[2])
-
-# 최종 루트노드를 찾기
-def find_root_node(parents, x):
+# 최종 부모노드를 찾는 함수
+def get_root_node(x):
+  global parents
   if( parents[x] != x ):
-    parents[x] = find_root_node(parents, parents[x])
+    parents[x] = get_root_node(parents[x])
   return parents[x]
 
-# Union
-def union(parents, a,b):
-  a=find_root_node(parents,a)
-  b=find_root_node(parents,b)
+# union
+def union(a,b):
+  global parents
+  a = get_root_node(a)
+  b = get_root_node(b)
   if(a<b):
     parents[b] = a
   else:
     parents[a] = b
-  
-answer = 0
-# 최소 스패닝 트리만든다음에 스패닝트리에서 가장 가중치 큰 간선빼면 2개의 마을로 분할됨
-maxium_edge_weight_in_spanninTree = 0
+
+info = sorted(info, key=lambda x: x[0])
+for i in range(0,n-1):
+  graph.append( (info[i][3], info[i+1][3], abs(info[i][0] - info[i+1][0]) ) )
+info = sorted(info, key=lambda x: x[1])
+for i in range(0,n-1):
+  graph.append( (info[i][3], info[i+1][3], abs(info[i][1] - info[i+1][1]) ))
+info = sorted(info, key=lambda x: x[2])
+for i in range(0,n-1):
+  graph.append( (info[i][3], info[i+1][3], abs(info[i][2] - info[i+1][2]) ) )
+
+graph = sorted(graph, key=lambda x:x[2])
+
 for edge in graph:
   a,b,c = edge
-  if(find_root_node(parents,a) != find_root_node(parents,b)):
-    union(parents, a,b)
-    if( maxium_edge_weight_in_spanninTree < c):
-      maxium_edge_weight_in_spanninTree=c
+  if( get_root_node(a) != get_root_node(b) ):
+    union(a,b)
     answer+=c
-print(answer - maxium_edge_weight_in_spanninTree)
+print(answer)
