@@ -1,49 +1,34 @@
 import sys
 input = sys.stdin.readline
 
+n = int(input().rstrip())
+have = list(map(int, input().rstrip().split(" ")))
 
-def get_root_nodes(parents, x):
+m = int(input().rstrip())
+target_num = list(map(int, input().rstrip().split(" ")))
 
-    if(parents[x] != x):
-        parents[x] = get_root_nodes(parents, parents[x])
-    return parents[x]
+# 이진 탐색을 위한 정렬
+have = sorted(have)
 
 
-def union(parents, a, b):
-    a = get_root_nodes(parents, a)
-    b = get_root_nodes(parents, b)
-    if(a < b):
-        parents[b] = a
-    else:
-        parents[a] = b
+def binary_search(arr, start, end, x):
+    while(start <= end):
+        mid = (start+end)//2
+        if(arr[mid] == x):
+            return True
+        else:
+            if(arr[mid] > x):
+                end = mid-1
+            else:
+                start = mid+1
+    return False
 
 
 answers = []
-while(1):
-    house_len, street_len = map(int, input().rstrip().split(" "))
-    if(house_len == 0 and street_len == 0):
-        break
-    street_infos = []
-    total = 0
-    for _ in range(street_len):
-        x, y, z = map(int, input().rstrip().split(" "))
-        total += z
-        street_infos.append((x, y, z))
-        street_infos.append((y, x, z))
+for t in target_num:
+    if(binary_search(have, 0, n-1, t) == True):
+        answers.append(1)
+    else:
+        answers.append(0)
 
-    parents = [0] * (house_len)
-    for i in range(house_len):
-        parents[i] = i
-
-    street_infos = sorted(street_infos, key=lambda x: x[2])
-    answer = 0
-    for edge in street_infos:
-        x, y, z = edge
-
-        if(get_root_nodes(parents, x) != get_root_nodes(parents, y)):
-            union(parents, x, y)
-            answer += z
-    answers.append(total-answer)
-
-for a in answers:
-    print(a)
+print(" ".join(map(str, answers)))
