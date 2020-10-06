@@ -1,34 +1,36 @@
 import sys
 input = sys.stdin.readline
 
-n = int(input().rstrip())
-have = list(map(int, input().rstrip().split(" ")))
+k, n = map(int, input().rstrip().split(" "))
 
-m = int(input().rstrip())
-target_num = list(map(int, input().rstrip().split(" ")))
+lans = []
+for _ in range(k):
+    lans.append(int(input().rstrip()))
 
-# 이진 탐색을 위한 정렬
-have = sorted(have)
+lans = sorted(lans)
 
 
-def binary_search(arr, start, end, x):
+def count_lans(lans, x):
+    count = 0
+    for l in lans:
+        count += l//x
+    return count
+
+
+def binary_search_custom(arr, start, end, target):
+    res = 0
     while(start <= end):
         mid = (start+end)//2
-        if(arr[mid] == x):
-            return True
+
+        lan_count = count_lans(arr, mid)
+        if(lan_count >= target):
+            res = mid
+            start = mid+1
         else:
-            if(arr[mid] > x):
-                end = mid-1
-            else:
-                start = mid+1
-    return False
+            end = mid-1
+    return res
 
 
-answers = []
-for t in target_num:
-    if(binary_search(have, 0, n-1, t) == True):
-        answers.append(1)
-    else:
-        answers.append(0)
-
-print(" ".join(map(str, answers)))
+start = 1
+end = max(lans)
+print(binary_search_custom(lans, start, end, n))
