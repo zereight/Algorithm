@@ -1,36 +1,20 @@
 import sys
 input = sys.stdin.readline
-
-k, n = map(int, input().rstrip().split(" "))
-
-lans = []
-for _ in range(k):
-    lans.append(int(input().rstrip()))
-
-lans = sorted(lans)
-
-
-def count_lans(lans, x):
-    count = 0
-    for l in lans:
-        count += l//x
-    return count
-
-
-def binary_search_custom(arr, start, end, target):
-    res = 0
-    while(start <= end):
-        mid = (start+end)//2
-
-        lan_count = count_lans(arr, mid)
-        if(lan_count >= target):
-            res = mid
-            start = mid+1
-        else:
-            end = mid-1
-    return res
-
-
-start = 1
-end = max(lans)
-print(binary_search_custom(lans, start, end, n))
+n = int(input().rstrip())
+have = list(map(int, input().rstrip().split(" ")))
+m = int(input().rstrip())
+cards = list(map(int, input().rstrip().split(" ")))
+have = sorted(have)
+counts = dict()
+for h in have:
+    try:
+        counts[h] += 1
+    except:
+        counts[h] = 1
+answers = []
+for c in cards:
+    try:
+        answers.append(counts[c])
+    except:
+        answers.append(0)
+print(" ".join(map(str, answers)))
