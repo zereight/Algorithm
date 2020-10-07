@@ -1,20 +1,20 @@
 import sys
 input = sys.stdin.readline
+
 n = int(input().rstrip())
-have = list(map(int, input().rstrip().split(" ")))
-m = int(input().rstrip())
-cards = list(map(int, input().rstrip().split(" ")))
-have = sorted(have)
-counts = dict()
-for h in have:
-    try:
-        counts[h] += 1
-    except:
-        counts[h] = 1
-answers = []
-for c in cards:
-    try:
-        answers.append(counts[c])
-    except:
-        answers.append(0)
-print(" ".join(map(str, answers)))
+k = int(input().rstrip())
+
+points = list(map(int, input().rstrip().split(" ")))
+
+# 정렬
+points = sorted(list(set(points)))
+
+gap = []
+if(len(points) > 1):
+    for i in range(0, len(points)-1):
+        gap.append(abs(points[i]-points[i+1]))
+    gap = sorted(gap)
+    for i in range(k-1):
+        gap.pop()
+
+print(sum(gap))
