@@ -1,35 +1,24 @@
 import sys
+sys.setrecursionlimit(10**6)
 input = sys.stdin.readline
 
+length, width, height = map(int, input().rstrip().split(" "))
 n = int(input().rstrip())
-req = list(map(int, input().rstrip().split(" ")))
-total = int(input().rstrip())
 
-req = sorted(req)
+cubes = [0] * 21
+for _ in range(n):
+    a, b = map(int, input().rstrip().split(" "))
+    cubes[a] += b
 
+total = 0
+count = 0
+for i in range(19, -1, -1):
+    total <<= 3
+    t = min(cubes[i], (length >> i)*(width >> i)*(height >> i) - total)
+    total += t
+    count += t
 
-def getTotal(req, x):
-    ans = 0
-    for r in req:
-        if(r <= x):
-            ans += r
-        else:
-            ans += x
-    return ans
-
-
-def binary_search_upper(req, start, end, target):
-    while(start <= end):
-        mid = (start+end)//2
-        # 배정한 예산의 합이 총예산 이하이면 1더 더해서 최대 m을 찾아준다.
-        if(getTotal(req, mid) <= target):
-            start = mid+1
-
-        else:
-            end = mid-1
-
-    return end
-
-
-answer = binary_search_upper(req, 0, max(req), total)
-print(answer)
+if(total == length*width*height):
+    print(count)
+else:
+    print(-1)
