@@ -1,10 +1,11 @@
 import sys
+sys.setrecursionlimit(10**6)
 input = sys.stdin.readline
 
-n = int(input().rstrip())
-m = int(input().rstrip())
+n, m = map(int, input().rstrip().split(" "))
+
 graph = dict()
-for i in range(1, n+1):
+for i in range(1, 1+n):
     graph[i] = []
 
 for _ in range(m):
@@ -12,18 +13,20 @@ for _ in range(m):
     graph[a].append(b)
     graph[b].append(a)
 
-visited = [0] * (n+1)
+visited = [0]*(1+n)
 
 
-def dfs(graph, v, visited):
-    # 현재노드 방문처리
-    visited[v] = 1
-    # 현재노드와 인접한 다른 노드 재귀적으로 방문
-    for i in graph[v]:
-        if not visited[i]:
-            dfs(graph, i, visited)
+def dfs(graph, visited, start, marking):
+    visited[start] = marking
+    for g in graph[start]:
+        if(visited[g] == 0):
+            dfs(graph, visited, g, marking)
 
 
-dfs(graph, 1, visited)
+marking = 1
+for i in range(1, n+1):
+    if(visited[i] == 0):
+        dfs(graph, visited, i, marking)
+    marking += 1
 
-print(sum(visited[1:])-1)
+print(len(set(visited[1:])))
