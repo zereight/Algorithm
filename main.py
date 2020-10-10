@@ -1,44 +1,29 @@
 import sys
-from collections import deque
 input = sys.stdin.readline
 
 n = int(input().rstrip())
-
+m = int(input().rstrip())
 graph = dict()
 for i in range(1, n+1):
     graph[i] = []
-inDegree = [0]*(n+1)
 
-costs = [0]*(n+1)
-for i in range(1, n+1):
-    info = list(map(int, input().rstrip().split(" ")))[:-1]
-    costs[i] = info[0]
-    must_list = info[1:]
+for _ in range(m):
+    a, b = map(int, input().rstrip().split(" "))
+    graph[a].append(b)
+    graph[b].append(a)
 
-    for j in must_list:
-        graph[j].append(i)
-        inDegree[i] += 1  # InDegree 증가
+visited = [0] * (n+1)
 
-spendTime = [0]*(n+1)
-while(1):
-    q = deque()
-    for i in range(1, n+1):  # indegree 0인거 추가
-        if(inDegree[i] == 0):
-            q.append(i)
-            inDegree[i] -= 1
 
-    if(len(q) == 0):
-        break
+def dfs(graph, v, visited):
+    # 현재노드 방문처리
+    visited[v] = 1
+    # 현재노드와 인접한 다른 노드 재귀적으로 방문
+    for i in graph[v]:
+        if not visited[i]:
+            dfs(graph, i, visited)
 
-    # InDegree 0인 건물에 한해서 동시 건축
-    while(len(q) != 0):
-        building = q.pop()
-        spendTime[building] += costs[building]
 
-        # 연결된 간선에 indegree - 1
-        for g in graph[building]:
-            inDegree[g] -= 1
-            spendTime[g] = max(spendTime[g], spendTime[building])
+dfs(graph, 1, visited)
 
-for i in spendTime[1:]:
-    print(i)
+print(sum(visited[1:])-1)
