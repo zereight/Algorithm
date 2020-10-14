@@ -1,48 +1,74 @@
 import sys
+from collections import deque
+from itertools import combinations
+import copy
 input = sys.stdin.readline
 
-T = int(input().rstrip())
+n, m = map(int, input().rstrip().split(" "))
 
-answers = []
-for _ in range(T):
-    n = int(input().rstrip())
+# 0은 빈칸, 1은 벽, 2는 바이러스
 
-    stickers = []
-    stickers.append(list(map(int, input().rstrip().split(" "))))
-    stickers.append(list(map(int, input().rstrip().split(" "))))
+board = []
+virus_pos = []
+nothing_area = []  # 0인 공간
+for i in range(n):
+    row = list(map(int, input().rstrip().split(" ")))
+    board.append(row)
+    for j in range(m):
+        if(row[j] == 2):
+            virus_pos.append((i, j))
+        elif(row[j] == 0):
+            nothing_area.append((i, j))
 
-    dp = []
-    # dp[i][j] = i,j에 위치에 있는 스티커를 떼었을떼 최대 가치
-    dp.append([0]*n)
-    dp.append([0]*n)
 
-    # 1번쨰 초기화
-    dp[0][0] = stickers[0][0]
-    dp[1][0] = stickers[1][0]
+# 모든 조합을 다 찾아야함, dp로 풀기 어려움
 
-    if(n == 1):
-        answers.append(max(dp[0][0], dp[1][0]))
-        continue
+def build_wall(wall_pos, board, virus_pos):
+    global n, m, answer
+    # 상하좌우
+    direction = ((-1, 0), (1, 0), (0, -1), (0, 1))
 
-    # 2번쨰 초기화
-    dp[0][1] = dp[1][0] + stickers[0][1]
-    dp[1][1] = dp[0][0] + stickers[1][1]
-    if(n == 2):
-        answers.append(max(dp[0][1], dp[1][1]))
-        continue
+    board = copy.deepcopy(board)  # deepcopy
+    # 3개의 벽을 세울 좌표를 찍는다.
+    for i, j in wall_pos:
+        board[i][j] = 1
 
-    for i in range(2, n):
-        # 범위 내면 앞 2번쨰칸을 선택했을 떄까지 고려
-        dp[0][i] = max(dp[1][i-1] + stickers[0][i],
-                       stickers[0][i] + max(dp[0][i-2], dp[1][i-2]))
-        dp[1][i] = max(dp[0][i-1] + stickers[1][i],
-                       stickers[1][i]+max(dp[0][i-2], dp[1][i-2]))
+    # 전염 전 총 0개수
+    zero_count = n*m - len(wall_pos) - len(virus_pos)
 
-    # print()
-    # print(dp[0])
-    # print(dp[1])
-    # print()
-    answers.append(max(dp[0][n-1], dp[1][n-1]))
+    # 바이러스가 퍼진다.
+    for vx, vy in virus_pos:
+        q = deque()
+        q.append((vx, vy))
 
-for a in answers:
-    print(a)
+        while(len(q) != 0):
+            x, y = q.popleft()
+            for i in range(4):
+                new_x, new_y = x+direction[i][0], y+direction[i][1]
+                # 유효범위체크
+                if(new_x >= 0 and new_y >= 0 and new_x < n and new_y < m):
+                    # 벽아니고 바이러스 아닌곳만, 즉, 빈곳만
+                    if(board[new_x][new_y] == 0):
+                        q.append((new_x, new_y))
+                        board[new_x][new_y] = 2  # 미리마킹해서 큐에 안들어가게 해줌. 속도빠르게1
+                        zero_count -= 1
+                        if(zero_count < answer):  # 0의 개수가 줄어드는데 전역변수 answer보다 작으면 의미없으므로 조기종료. 속도빠르게2
+                            return -1
+    # 0의 개수를 센다.
+
+    res = 0
+    for b in board:
+        # print(b)
+        res += b.count(0)
+    return res
+
+# 예제1
+# print(build_wall([(0, 1), (1, 0), (3, 5)], board, virus_pos))
+
+
+answer = 0
+for a in combinations(nothing_area, 3):
+    res = build_wall(a, board, virus_pos)
+    if(answer < res):
+        answer = res
+print(answer)
