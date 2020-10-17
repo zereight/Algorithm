@@ -1,44 +1,37 @@
-import sys
-import copy
-input = sys.stdin.readline
+import heapq
 
-s = list(map(int, list(input().rstrip())))
 
-# 0->1뒤집기
-count1 = 0
-i = 0
-complete_0to1 = False
-temp1 = -1
-# 1->0뒤집기
-count2 = 0
-j = 0
-complete_1to0 = False
-temp2 = -1
+def solution(food_times, k):
+    answer = 0
+    foods = []
 
-for i, _s in enumerate(s):  # 최대 100만미만이므로 한큐에 해결하는게 낫다.
-    # print(temp1, temp2)
-    if(_s == 0):  # 0이면
-        if(temp1 == -1):  # 0->1 시작지점마킹
-            temp1 = i
+    if(sum(food_times) <= k):
+        return -1
 
-        if(temp2 != -1):  # 1->0 마킹한거 초기화 하고 카운트 +1
-            count2 += 1
-            temp2 = -1
+    for i, f in enumerate(food_times):  # (음식개수, 순서)로 저장
+        heapq.heappush(foods, (f, i+1))
 
-    else:  # 1이면
-        if(temp1 != -1):  # 0->1 마킹한거 초기화 하고 카운트 +1
-            count1 += 1
-            temp1 = -1
+    total_time = 0
+    curr_food = -1
+    prev_food = 0
+    length = len(food_times)
+    while(1):
+        curr_food, curr_index = heapq.heappop(foods)  # 가장 작은 음식개수를 가진 음식 추출
 
-        if(temp2 == -1):  # 1->0 시작지점 마킹
-            temp2 = i
+        curr_food -= prev_food  # 이전에 먹은 음식 개수만큼 뺴줌. 같은 음식개수면 자동으로 0
 
-# 남은 숫자에 대해 마킹해제 + 카운트
-if(temp1 != -1):
-    count1 += 1
-    temp1 = -1
-if(temp2 != -1):
-    count2 += 1
-    temp2 = -1
+        if((total_time + curr_food*length) > k):  # 다음 음식까지 다먹으면 k초 이상되버림
+            curr_food += prev_food
+            foods.append((curr_food, curr_index))
+            break
 
-print(min(count1, count2))
+        total_time += curr_food*length  # 남은 개수 * 남은 음식길이
+        length -= 1  # 음식 1개 끝냈으므로 1개 줄임
+        prev_food = curr_food + prev_food  # 다시 원상복귀
+
+    answer = sorted(foods, key=lambda x: x[1])[(k-total_time) % length][1]
+
+    return answer
+
+
+#print(solution([3, 1, 2], 5))
