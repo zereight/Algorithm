@@ -1,40 +1,34 @@
 import sys
-from collections import deque
-import bisect
+import copy
+from itertools import combinations
 input = sys.stdin.readline
 
-n, m, k, x = map(int, input().rstrip().split(" "))
-graph = dict()
-for i in range(1, n+1):
-    graph[i] = []
-for _ in range(m):
-    start, end = map(int, input().rstrip().split(" "))
-    graph[start].append(end)
+n, m = map(int, input().rstrip().split(" "))
 
-visited = [-1]*(n+1)
-
-curr = x
-q = deque()
-q.append(curr)
-distance = 1
-visited[curr] = 0
-answer = []
-
-while(len(q) != 0):
-    curr = q.popleft()
-    if(visited[curr] == k):
-        break
-    # print(curr)
-    for dest in graph[curr]:
-        if(visited[dest] == -1):
-            q.append(dest)
-            visited[dest] = visited[curr]+1
-            if(visited[curr]+1 == k):
-                bisect.insort(answer, dest)
+chicken_pos = []
+house_pos = []
+for i in range(n):
+    row = list(map(int, input().rstrip().split(" ")))
+    for j in range(n):
+        if(row[j] == 2):
+            chicken_pos.append((i, j))
+        elif(row[j] == 1):
+            house_pos.append((i, j))
 
 
-if(len(answer) != 0):
-    for i in answer:
-        print(i)
-else:
-    print(-1)
+def getChickenDistance(a, b):
+    return abs(a[0]-b[0]) + abs(a[1]-b[1])
+
+
+answer = float('inf')
+for s in combinations(chicken_pos, m):  # 살릴 치킨집 경우의 수 모두 출력
+    myCityDistance = 0
+    for h in house_pos:  # 각 집의 치킨거리를 구함
+        myChickenDistance = float('inf')
+        for _s in s:
+            myChickenDistance = min(
+                getChickenDistance(h, _s), myChickenDistance)
+        myCityDistance += myChickenDistance
+    answer = min(answer, myCityDistance)
+
+print(answer)
