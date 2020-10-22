@@ -1,29 +1,26 @@
 import sys
+sys.setrecursionlimit(10**6)
+board = []
+n = 5
+for _ in range(n):
+    board.append([*map(int, input().rstrip().split(" "))])
 
-input = sys.stdin.readline
+answer = set()
 
-def dfs(x, y, shape):
-    global ans
-    if x == n-1 and y == n-1:
-        ans += 1
+
+def dfs(x, y, string):
+    global answer, board, n
+    if(len(string) == 6):
+        answer.add(string)
         return
 
-    if shape == 0 or shape == 2:
-        if y + 1 < n:
-            if a[x][y+1] == 0:
-                dfs(x, y+1, 0)
-    if shape == 1 or shape == 2:
-        if x + 1 < n:
-            if a[x+1][y] == 0:
-                dfs(x+1, y, 1)
-    if shape == 0 or shape == 1 or shape == 2:
-        if x + 1 < n and y + 1 < n:
-            if a[x+1][y] == 0 and a[x][y+1] == 0 and a[x+1][y+1] == 0:
-                dfs(x+1, y+1, 2)
+    for a, b in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+        if(x+a >= 0 and y+b >= 0 and x+a < n and y+b < n):
+            dfs(x+a, y+b, string+str(board[x+a][y+b]))
 
 
-n = int(input())
-a = [list(map(int, input().split())) for _ in range(n)]
-ans = 0
-dfs(0, 1, 0)
-print(ans)
+for i in range(5):
+    for j in range(5):
+        dfs(i, j, str(board[i][j]))
+
+print(len(answer))
