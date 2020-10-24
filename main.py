@@ -1,26 +1,35 @@
 import sys
 sys.setrecursionlimit(10**6)
-board = []
-n = 5
-for _ in range(n):
-    board.append([*map(int, input().rstrip().split(" "))])
+input = sys.stdin.readline
+n = int(input().rstrip())
 
-answer = set()
+parents = [i for i in range(n+1)]  # 자기자신을 부모로하는 정보배열
 
-
-def dfs(x, y, string):
-    global answer, board, n
-    if(len(string) == 6):
-        answer.add(string)
-        return
-
-    for a, b in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-        if(x+a >= 0 and y+b >= 0 and x+a < n and y+b < n):
-            dfs(x+a, y+b, string+str(board[x+a][y+b]))
+graph = dict()
+for i in range(1, n+1):
+    graph[i] = []
 
 
-for i in range(5):
-    for j in range(5):
-        dfs(i, j, str(board[i][j]))
+for _ in range(n-1):
+    a, b = map(int, input().rstrip().split(" "))
+    graph[a].append(b)
+    graph[b].append(a)
 
-print(len(answer))
+
+def dfs(curr):
+    global parents, graph
+
+    for dest in graph[curr]:
+        if(parents[dest] == dest):
+            parents[dest] = curr
+            dfs(dest)
+
+
+def answer():
+    global parents
+    for i in parents[2:]:
+        print(i)
+
+
+dfs(1)
+answer()
