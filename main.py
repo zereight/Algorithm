@@ -1,35 +1,29 @@
-import sys
-sys.setrecursionlimit(10**6)
-input = sys.stdin.readline
 n = int(input().rstrip())
+a, b = map(int, input().rstrip().split(" "))
+m = int(input().rstrip())
+graph = [[] for _ in range(n+1)]
+for _ in range(m):
+    c, d = map(int, input().rstrip().split(" "))
+    graph[c].append(d)
+    graph[d].append(c)
 
-parents = [i for i in range(n+1)]  # 자기자신을 부모로하는 정보배열
-
-graph = dict()
-for i in range(1, n+1):
-    graph[i] = []
-
-
-for _ in range(n-1):
-    a, b = map(int, input().rstrip().split(" "))
-    graph[a].append(b)
-    graph[b].append(a)
+values = [-1] * (n+1)  # (group_num, value)
+values[a] = 0
 
 
 def dfs(curr):
-    global parents, graph
+    global graph, values
 
     for dest in graph[curr]:
-        if(parents[dest] == dest):
-            parents[dest] = curr
+        if(values[dest] == -1):
+            values[dest] = values[curr]+1
             dfs(dest)
 
 
-def answer():
-    global parents
-    for i in parents[2:]:
-        print(i)
+dfs(a)
 
-
-dfs(1)
-answer()
+if(values[b] == -1):  # a부터 갈 수 있는 곳은 다들렀을텐데 b값이 -1이면 가족이 아닌거
+    print(-1)
+else:
+    # print(values)
+    print(abs(values[a]-values[b]))
