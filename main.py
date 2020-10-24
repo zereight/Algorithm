@@ -1,29 +1,37 @@
-n = int(input().rstrip())
-a, b = map(int, input().rstrip().split(" "))
-m = int(input().rstrip())
-graph = [[] for _ in range(n+1)]
-for _ in range(m):
-    c, d = map(int, input().rstrip().split(" "))
-    graph[c].append(d)
-    graph[d].append(c)
-
-values = [-1] * (n+1)  # (group_num, value)
-values[a] = 0
+import copy
+import sys
+sys.setrecursionlimit(10**6)
+input = sys.stdin.readline
+R, C = map(int, input().rstrip().split(" "))
+board = []
+for _ in range(R):
+    board.append(list(input().rstrip()))
 
 
-def dfs(curr):
-    global graph, values
+d = dict()
+for i in range(ord('A'), ord('Z')+1):
+    d[chr(i)] = 0  # 0은 미방문, 1은 방문
 
-    for dest in graph[curr]:
-        if(values[dest] == -1):
-            values[dest] = values[curr]+1
-            dfs(dest)
+# 상하좌우
+direction = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+answer = 1
 
 
-dfs(a)
+def bfs(curr_x, curr_y):
+    global d, board, R, C, direction, answer
+    q = set()
+    q.add((curr_x, curr_y, board[curr_x][curr_y]))
+    while(len(q) != 0):
+        x, y, s = q.pop()
+        for i in range(4):
+            new_x, new_y = x+direction[i][0], y+direction[i][1]
+            if(new_x >= 0 and new_y >= 0 and new_x < R and new_y < C):
+                if(board[new_x][new_y] not in s):
+                    q.add((new_x, new_y, s+board[new_x][new_y]))
+                    answer = max(answer, len(s)+1)
 
-if(values[b] == -1):  # a부터 갈 수 있는 곳은 다들렀을텐데 b값이 -1이면 가족이 아닌거
-    print(-1)
-else:
-    # print(values)
-    print(abs(values[a]-values[b]))
+
+bfs(0, 0)
+print(answer)
+# print(res)
