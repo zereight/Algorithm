@@ -1,37 +1,53 @@
-import copy
 import sys
-sys.setrecursionlimit(10**6)
+from itertools import permutations
 input = sys.stdin.readline
-R, C = map(int, input().rstrip().split(" "))
-board = []
-for _ in range(R):
-    board.append(list(input().rstrip()))
+ining_num = int(input().rstrip())
+
+ining_res = []
+for _ in range(ining_num):
+    ining_res.append(list(map(int, input().rstrip().split(" "))))
 
 
-d = dict()
-for i in range(ord('A'), ord('Z')+1):
-    d[chr(i)] = 0  # 0은 미방문, 1은 방문
+def getScore(ining, i, tmp_ans):
+    out_count = 0
+    base3, base2, base1 = 0, 0, 0  # list슬라이싱말고 변수 3개로 대입하는 방식으로 표현
+    while(out_count < 3):  # 아웃 3번채울때까지 해당이닝 무한반복
+        if(ining[order[i]] == 0):  # 아웃이면 체크하고
+            out_count += 1
+        elif(ining[order[i]] == 1):
+            tmp_ans += base3
+            base3, base2, base1 = base2, base1, 1
+        elif(ining[order[i]] == 2):
+            tmp_ans += (base3+base2)
+            base3, base2, base1 = base1, 1, 0
+        elif(ining[order[i]] == 3):
+            tmp_ans += (base3+base2+base1)
+            base3, base2, base1 = 1, 0, 0
+        elif(ining[order[i]] == 4):
+            tmp_ans += (base1+base2+base3 + 1)
+            base1, base2, base3 = 0, 0, 0
 
-# 상하좌우
-direction = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-
-answer = 1
+        i = (i+1) % 9  # 다음 플레이어
+    return i, tmp_ans
 
 
-def bfs(curr_x, curr_y):
-    global d, board, R, C, direction, answer
-    q = set()
-    q.add((curr_x, curr_y, board[curr_x][curr_y]))
-    while(len(q) != 0):
-        x, y, s = q.pop()
-        for i in range(4):
-            new_x, new_y = x+direction[i][0], y+direction[i][1]
-            if(new_x >= 0 and new_y >= 0 and new_x < R and new_y < C):
-                if(board[new_x][new_y] not in s):
-                    q.add((new_x, new_y, s+board[new_x][new_y]))
-                    answer = max(answer, len(s)+1)
+answer = 0
+for order in permutations(range(1, 9), 8):  # 1~8까지 순열
+    # if(order[4-1] != 1-1):  # 1번선수가 4번자리에 없으면 다시
+    #     continue
+
+    # 모든 순열을 구한뒤 4번째자리가 첫번째 투수인지 체크하는 방법 보다는
+    # 1~8까지 배치후에 4번쨰자리에 첫번쨰 투수를 삽입하는 방법 사용
+    order = (*order[:3], 0, *order[3:])
+
+    tmp_ans = 0
+
+    i = 0
+    for ining in ining_res:
+        i, tmp_ans = getScore(ining, i, tmp_ans)
+
+    answer = max(answer, tmp_ans)
 
 
-bfs(0, 0)
 print(answer)
-# print(res)
+# print(ans_l)
