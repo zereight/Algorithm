@@ -1,31 +1,16 @@
 import sys
+from collections import deque
 input = sys.stdin.readline
 
+n = int(input().rstrip())
 
-def dfs(curr):
-    global answer
-    answer += 1
-    for dest in graph[curr]:
-        if(visited[dest] == 0):
-            visited[dest] = 1
-            dfs(dest)
+cards = deque()
+for i in range(1, n+1):
+    cards.append(i)
 
+while(len(cards) != 1):
+    cards.popleft()  # 제일 위에 있는 카드를 버린다.
+    # 제일 위에 있는 카드를 제일 아래로 옮긴다.
+    cards.append(cards.popleft())
 
-answer, graph, visited = None, None, None
-answers = []
-T = int(input().rstrip())
-for _ in range(T):
-    answer = 0
-    n, m = map(int, input().rstrip().split(" "))
-    graph = [[] for _ in range(n+1)]
-    visited = [0]*(n+1)
-    for _ in range(m):
-        start, end = map(int, input().rstrip().split(" "))
-        graph[start].append(end)
-        graph[end].append(start)
-    visited[1] = 1
-    dfs(1)
-    answers.append(answer)
-
-for a in answers:
-    print(a-1)
+print(cards[0])
