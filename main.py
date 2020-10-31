@@ -1,7 +1,18 @@
-import sys
-input = sys.stdin.readline
+n = int(input().rstrip())
 
-t = int(input().rstrip())
-for _ in range(t):
-    print((" ").join(
-        list(map(lambda x: x[::-1], input().rstrip().split(" ")))))
+dp = [0]*(1000000+1)
+
+# 1, 00
+
+dp[1] = 1  # 1
+dp[2] = 2  # 11, 00
+# dp[3] = 3  # 111, 001, 100
+# dp[4] = 5  # 0000, 1100, 0011, 1001, 1111
+# dp[5] = 8  # 00001, 10000, 00100, 11100, 00111, 11111, 11001, 10011
+
+for i in range(3, 1000000+1):
+    dp[i] = (dp[i-1] % 15746+dp[i-2] % 15746) % 15746
+    if(n == i):
+        break
+
+print(dp[n] % 15746)
