@@ -1,18 +1,46 @@
-n = int(input().rstrip())
+# pypy3로 제출할것.
+import sys
+import copy
+from collections import deque
+input = sys.stdin.readline
 
-dp = [0]*(1000000+1)
+n, m = map(int, input().rstrip().split(" "))
+graph = [[] for _ in range(n+1)]
 
-# 1, 00
+for _ in range(m):
+    a, b = map(int, input().rstrip().split(" "))
+    graph[b].append(a)
 
-dp[1] = 1  # 1
-dp[2] = 2  # 11, 00
-# dp[3] = 3  # 111, 001, 100
-# dp[4] = 5  # 0000, 1100, 0011, 1001, 1111
-# dp[5] = 8  # 00001, 10000, 00100, 11100, 00111, 11111, 11001, 10011
 
-for i in range(3, 1000000+1):
-    dp[i] = (dp[i-1] % 15746+dp[i-2] % 15746) % 15746
-    if(n == i):
-        break
+def bfs(x):
+    global graph, n
 
-print(dp[n] % 15746)
+    q = deque()
+    q.append(x)
+    visited = [0] * (n+1)
+    visited[x] = 1
+    count = 0
+
+    while(len(q) != 0):
+        start = q.popleft()
+        count += 1
+        for dest in graph[start]:
+            if(visited[dest] == 0):
+                q.append(dest)
+                visited[dest] = 1
+
+    return count
+
+
+maximum = -1
+maximum_idx = []
+for i in range(1, n+1):
+    if(len(graph[i]) > 0):
+        tmp = bfs(i)
+        if(tmp > maximum):
+            maximum = tmp
+            maximum_idx = [i]
+        elif(tmp == maximum):
+            maximum_idx.append(i)
+
+print(*maximum_idx)
