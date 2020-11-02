@@ -1,46 +1,20 @@
-# pypy3로 제출할것.
 import sys
-import copy
-from collections import deque
 input = sys.stdin.readline
 
 n, m = map(int, input().rstrip().split(" "))
-graph = [[] for _ in range(n+1)]
 
-for _ in range(m):
-    a, b = map(int, input().rstrip().split(" "))
-    graph[b].append(a)
+board = [[*map(int, input().rstrip().split(" "))] for _ in range(n)]
+dp = [[0]*m for _ in range(n)]
 
+dp[0][0] = board[0][0]
 
-def bfs(x):
-    global graph, n
+for i in range(n):
+    for j in range(m):
+        for a, b in ((1, 0), (0, 1), (1, 1)):
+            new_i = i+a
+            new_j = j+b
+            if(new_i >= 0 and new_j >= 0 and new_i < n and new_j < m):
+                dp[new_i][new_j] = max(
+                    dp[new_i][new_j], board[new_i][new_j]+dp[i][j])
 
-    q = deque()
-    q.append(x)
-    visited = [0] * (n+1)
-    visited[x] = 1
-    count = 0
-
-    while(len(q) != 0):
-        start = q.popleft()
-        count += 1
-        for dest in graph[start]:
-            if(visited[dest] == 0):
-                q.append(dest)
-                visited[dest] = 1
-
-    return count
-
-
-maximum = -1
-maximum_idx = []
-for i in range(1, n+1):
-    if(len(graph[i]) > 0):
-        tmp = bfs(i)
-        if(tmp > maximum):
-            maximum = tmp
-            maximum_idx = [i]
-        elif(tmp == maximum):
-            maximum_idx.append(i)
-
-print(*maximum_idx)
+print(dp[n-1][m-1])
