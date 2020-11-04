@@ -1,22 +1,21 @@
 import sys
-from itertools import combinations
-import operator as op
-from functools import reduce
+import math
 
-input = sys.stdin.readline
+n = int(input().rstrip())
 
+dp = [0]*(n+1)
 
-def nCr(n, r):
-    if n < 1 or r < 0 or n < r:
-        raise ValueError
-    r = min(r, n-r)
-    numerator = reduce(op.mul, range(n, n-r, -1), 1)
-    denominator = reduce(op.mul, range(1, r+1), 1)
-    return numerator // denominator
+dp[1] = 1
+dp[2] = 2
+dp[3] = 3
 
+pows = []  # 제곱수들
+for i in range(4, n+1):
+    if(i in b):
+        dp[i] = 1
+        pows.append(i)
+    else:
 
-T = int(input().rstrip())
+        dp[i] = min([*map(lambda x:dp[x] + dp[i-x], pows)])
 
-for _ in range(T):
-    n, m = map(int, input().rstrip().split(" "))
-    print(nCr(m, n))
+print(dp[n])
