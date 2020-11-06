@@ -1,16 +1,11 @@
-import sys
-import math
-
-n = int(input().rstrip())
-
-dp = [0]*(n+1)
-
-for j in range(1, n+1):
-    dp[j] = j
-    for i in range(1, j):
-        if(i**2 > j):
+n = int(input())
+dp = [0 for i in range(n + 1)]
+square = [i * i for i in range(1, 317)]
+for i in range(1, n + 1):
+    s = []
+    for j in square:
+        if j > i:
             break
-
-        dp[j] = min(dp[j], dp[j - i**2] + 1)
-
+        s.append(dp[i - j])
+    dp[i] = min(s) + 1
 print(dp[n])
