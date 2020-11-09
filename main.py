@@ -1,26 +1,30 @@
-# 스테이지에 도달했으나, 아직 클리어하지 못한 플레이어 수 / 스테이지에 도달한 플레이어 수
-# 전체 스테이지 수 N
-# 사용자가 현재 멈춰있는 스테이지 번호가 담긴 배열 stages
-# 실패율이 높은 스테이지부터 내림차순으로 return하라
+import sys
+input = sys.stdin.readline
 
-def solution(n, stages):
-    answer = []
-    failure_ratio = []
-    for i in range(1, n+1):
+n, c = map(int, input().rstrip().split(" "))
+houses = []
+for _ in range(n):
+    houses.append(int(input().rstrip()))
 
-        # stage i번째를 도전한 사용자들
-        warriers = len(list(filter(lambda x: x >= i, stages)))
+houses = sorted(houses)
 
-        if(warriers == 0):
-            failure_ratio.append((i, 0))
-            continue
-        # 도전했으나 실패한 사용자들
-        losers = stages.count(i)
+start = houses[1] - houses[0]
+end = houses[-1] - houses[0]
+res = 0
 
-        failure_ratio.append((i, losers/warriers))
+while(start <= end):
+    mid = (start+end)//2
+    value = houses[0]
+    count = 1
 
-    answer = list(map(lambda x: x[0], sorted(
-        failure_ratio, key=lambda x: (-x[1], x[0])
-    )
-    ))
-    return answer
+    for i in range(1, n):
+        if(houses[i] >= value + mid):
+            value = houses[i]
+            count += 1
+    if(count >= c):
+        start = mid+1
+        res = mid
+    else:
+        end = mid-1
+
+print(res)
