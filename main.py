@@ -1,13 +1,17 @@
 import sys
 input = sys.stdin.readline
 
-answer = 0
-
 n = int(input().rstrip())
-A = sorted([*map(int, input().rstrip().split(" "))], reverse=True)
-B = sorted([*map(int, input().rstrip().split(" "))])
+
+info = []
 
 for i in range(n):
-    answer += A[i]*B[i]
+    age, name = input().rstrip().split(" ")
+    age = int(age)
 
-print(answer)
+    info.append((age, i, name))
+
+info = sorted(info, key=lambda x: (x[0], x[1]))
+
+for i in info:
+    print(F"{i[0]} {i[2]}")
