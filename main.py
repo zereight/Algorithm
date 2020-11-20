@@ -2,16 +2,11 @@ import sys
 input = sys.stdin.readline
 
 n = int(input().rstrip())
+points = []
+for _ in range(n):
+    points.append([*map(int, input().rstrip().split(" "))])
 
-info = []
+points = sorted(points, key=lambda p: (p[1], p[0]))
 
-for i in range(n):
-    age, name = input().rstrip().split(" ")
-    age = int(age)
-
-    info.append((age, i, name))
-
-info = sorted(info, key=lambda x: (x[0], x[1]))
-
-for i in info:
-    print(F"{i[0]} {i[2]}")
+for p in points:
+    print(" ".join([*map(str, p)]))
