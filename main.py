@@ -1,23 +1,11 @@
-function solution(arr, divisor) {
-    const temp = []
-    arr.map(
-        (a) => {
-            if( a%divisor == 0 ){
-                temp.push( 
-                    a
-                );
-            }
-            
-        }
-    )
+function solution(n) {
+    var answer = '';
 
-    temp.sort(
-        (a,b) => a-b
-    )
-    
-    if(temp.length == 0){
-        temp.push(-1)
+    let temp = ["수", "박"];
+
+    for(let i=0; i<n; i++){
+        answer += temp[i%2];
     }
 
-    return temp;
+    return answer;
 }
