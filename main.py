@@ -1,10 +1,23 @@
-function solution(n) {
-    var answer = 0;
-    let temp_3 = n.toString(3);
-    temp_3 = temp_3.split("").reverse().join("");
+function solution(arr, divisor) {
+    const temp = []
+    arr.map(
+        (a) => {
+            if( a%divisor == 0 ){
+                temp.push( 
+                    a
+                );
+            }
+            
+        }
+    )
 
-    answer = Number.parseInt(temp_3, 3);
+    temp.sort(
+        (a,b) => a-b
+    )
+    
+    if(temp.length == 0){
+        temp.push(-1)
+    }
 
-
-    return answer;
+    return temp;
 }
