@@ -4,27 +4,25 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
-const solution = (x, y) => {
+const solution = (l) => {
 
-    if (x > 0 && y > 0) {
-        console.log(1);
-    } else if (x > 0) {
-        console.log(4);
-    } else if (y > 0) {
-        console.log(2);
-    } else {
-        console.log(3);
-    }
+    let cnt = 1;
+    l.forEach(e => {
+        let answer = 0;
+        e.split(" ").map(ee => { answer += parseInt(ee) });
+        console.log(`Case #${cnt}: ${answer}`);
+        cnt++;
+    });
 
 }
 
 const input = [];
 rl.on("line", function(line) {
-    input.push(parseInt(line));
+    input.push(line);
 
 }).on("close", function() {
 
 
-    solution(input[0], input[1]);
+    solution(input.slice(1));
     process.exit();
 });
