@@ -1,36 +1,30 @@
 const readline = require("readline");
 const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
+    input: process.stdin,
+    output: process.stdout
 });
 
-const solution = l => {
-    
-    let ascending =true;
-    let descending = true;
-    for(let i=0; i<l.length-1; i++){
-        if(l[i] - l[i+1] !== 1){
-            descending = false;
-        }else if(l[i] - l[i+1] !== -1){
-            ascending = false;
-        }
-    }
+const solution = (x, y) => {
 
-    if(ascending || descending){
-        console.log( ascending ? "ascending" : "descending" );
-    }else{
-        console.log("mixed");
+    if (x > 0 && y > 0) {
+        console.log(1);
+    } else if (x > 0) {
+        console.log(4);
+    } else if (y > 0) {
+        console.log(2);
+    } else {
+        console.log(3);
     }
 
 }
 
-let input = null;
+const input = [];
 rl.on("line", function(line) {
-    input = line.split(" ").map(l => parseInt(l));
+    input.push(parseInt(line));
 
-  }).on("close", function() {
-    
+}).on("close", function() {
 
-    solution(input);
+
+    solution(input[0], input[1]);
     process.exit();
 });
