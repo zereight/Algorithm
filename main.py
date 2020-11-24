@@ -4,23 +4,33 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-const solution = (a,b) => {
-    if(a>b){
-        console.log(">");
-    }else if(a<b){
-        console.log("<");
-    }else{
-        console.log("==");
+const solution = l => {
+    
+    let ascending =true;
+    let descending = true;
+    for(let i=0; i<l.length-1; i++){
+        if(l[i] - l[i+1] !== 1){
+            descending = false;
+        }else if(l[i] - l[i+1] !== -1){
+            ascending = false;
+        }
     }
+
+    if(ascending || descending){
+        console.log( ascending ? "ascending" : "descending" );
+    }else{
+        console.log("mixed");
+    }
+
 }
 
-const input = [];
+let input = null;
 rl.on("line", function(line) {
-    input.push( line )
-  }).on("close", function() {
-    const a = input[0].split(" ")[0];
-    const b = input[0].split(" ")[1];
+    input = line.split(" ").map(l => parseInt(l));
 
-    solution(parseInt(a), parseInt(b));
+  }).on("close", function() {
+    
+
+    solution(input);
     process.exit();
 });
