@@ -5,23 +5,22 @@ const rl = readline.createInterface({
 });
 
 const solution = (a,b) => {
-    c1 = parseInt(a);
-    c2 = new Array(b[0], b[1], b[2]).map( a => parseInt(a) );
-    // console.log(c2);
-    c3 = c1*c2[2];
-    c4 = c1*c2[1];
-    c5 = c1*c2[0];
-    c6 = c3+c4*10+c5*100;
-    console.log(c3);
-    console.log(c4);
-    console.log(c5);
-    console.log(c6);
+    if(a>b){
+        console.log(">");
+    }else if(a<b){
+        console.log("<");
+    }else{
+        console.log("==");
+    }
 }
 
 const input = [];
 rl.on("line", function(line) {
     input.push( line )
   }).on("close", function() {
-    solution(input[0], input[1]);
+    const a = input[0].split(" ")[0];
+    const b = input[0].split(" ")[1];
+
+    solution(parseInt(a), parseInt(b));
     process.exit();
 });
