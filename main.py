@@ -4,20 +4,18 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
-const solution = (n) => {
-    let sum = 0;
-    let answer = -1;
-    n = Array.from(n);
-    n.map((e) => { sum += parseInt(e); })
-
-    if (sum % 3 === 0) {
-        n.sort();
-        n.reverse();
-        if (n[n.length - 1] === '0') {
-            answer = n.join("");
-        }
+const solution = (s) => {
+    const res = []
+    s = Array.from(s);
+    for (let i = s.length - 1; i >= 0; i--) {
+        res.push(s.slice(i));
     }
-    console.log(answer);
+    res.sort();
+    res.map(
+        r => {
+            console.log(r.join(""));
+        }
+    );
 }
 
 const input = [];
@@ -25,8 +23,6 @@ rl.on("line", function(line) {
     input.push(line);
 
 }).on("close", function() {
-    const n = input[0]
-
-    solution(n);
+    solution(input[0]);
     process.exit();
 });
