@@ -4,21 +4,20 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
-const solution = (nonListener, nonSawer) => {
-    nonListener = new Set(nonListener);
-    nonSawer = new Set(nonSawer);
-    const answer = [];
-    for (const e of nonListener) {
-        if (nonSawer.has(e)) {
-            answer.push(e);
+const solution = (n) => {
+    let sum = 0;
+    let answer = -1;
+    n = Array.from(n);
+    n.map((e) => { sum += parseInt(e); })
+
+    if (sum % 3 === 0) {
+        n.sort();
+        n.reverse();
+        if (n[n.length - 1] === '0') {
+            answer = n.join("");
         }
     }
-    answer.sort(); // 실제 문자정렬일때에는 compare함수 안줘도 된다.
-    console.log(answer.length);
-    for (const a of answer) {
-        console.log(a);
-    }
-
+    console.log(answer);
 }
 
 const input = [];
@@ -26,10 +25,8 @@ rl.on("line", function(line) {
     input.push(line);
 
 }).on("close", function() {
-    let n = input[0].split(" ").map(i => parseInt(i))[0];
-    const nonListener = input.slice(1, n + 1);
-    const nonSawer = input.slice(n + 1);
+    const n = input[0]
 
-    solution(nonListener, nonSawer);
+    solution(n);
     process.exit();
 });
