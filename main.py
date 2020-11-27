@@ -32,11 +32,11 @@ const solution = (students) => {
 
         }
     );
-
+    let answer = "";
     for (let i = 0; i < students.length; i++) {
-        console.log(students[i][0]);
+        answer += `${students[i][0]}\n`;
     }
-
+    console.log(answer);
 }
 
 const input = [];
