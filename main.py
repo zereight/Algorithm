@@ -1,56 +1,51 @@
 const readline = require("readline");
 const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
 });
 
-const solution = (a, b) => {
-    const aLength = a.length,
-        bLength = b.length;
-    const answer = [];
-    let aIndex = 0,
-        bIndex = 0;
-    a = a.map(e => parseInt(e));
-    b = b.map(e => parseInt(e));
-    while (aIndex < aLength || bIndex < bLength) {
-        if (aIndex < aLength && bIndex < bLength) {
-            if (a[aIndex] > b[bIndex]) {
-                answer.push(b[bIndex]);
-                bIndex++;
-            } else {
-                answer.push(a[aIndex]);
-                aIndex++;
-            }
-        } else {
-            if (aIndex < aLength) {
-                // while (aIndex < aLength) {
-                //     answer.push(a[aIndex]);
-                //     aIndex++;
-                // }
-                answer.push(...a.slice(aIndex));
-                aIndex = aLength;
-            } else {
-                // while (bIndex < bLength) {
-                //     answer.push(b[bIndex]);
-                //     bIndex++;
-                // }
-                answer.push(...b.slice(bIndex));
-                bIndex = bLength;
-            }
-        }
-
+const splitByX = (string) => {
+    if (string.includes("X")) {
+        string = string.split("X");
+    } else {
+        string = Array(string);
     }
-    console.log(answer.join(" "));
+    return string;
 }
 
-const input = [];
-rl.on("line", function(line) {
-    input.push(line);
+const solution = (matrix) => {
+    let rowCnt = 0;
+    let colCnt = 0;
+    let colString = "";
+    for (let i = 0; i < matrix.length; i++) {
+        for (const e of splitByX(matrix[i])) {
+            if (e.includes("..")) {
+                rowCnt++;
+            }
+        }
+    }
 
-}).on("close", function() {
-    const a = input[1].length === 1 ? [input[1]] : input[1].split(" ");
-    const b = input[2].length === 1 ? [input[2]] : input[2].split(" ");
+    for (let i = 0; i < matrix.length; i++) {
+        colString = "";
+        for (let j = 0; j < matrix.length; j++) {
+            colString += matrix[j][i];
+        }
+        for (const e of splitByX(colString)) {
+            if (e.includes("..")) {
+                colCnt++;
+            }
+        }
+    }
+    console.log(rowCnt, colCnt);
+};
+
+const input = [];
+rl.on("line", function (line) {
+    input.push(line);
+}).on("close", function () {
     delete input;
-    solution(a, b);
+
+    solution(input.slice(1));
+
     process.exit();
 });
