@@ -4,48 +4,54 @@ const rl = readline.createInterface({
     output: process.stdout,
 });
 
-const splitByX = (string) => {
-    if (string.includes("X")) {
-        string = string.split("X");
-    } else {
-        string = Array(string);
-    }
-    return string;
-}
-
-const solution = (matrix) => {
-    let rowCnt = 0;
-    let colCnt = 0;
-    let colString = "";
-    for (let i = 0; i < matrix.length; i++) {
-        for (const e of splitByX(matrix[i])) {
-            if (e.includes("..")) {
-                rowCnt++;
+const solution = (string) => {
+    const info = new Array(string.length).fill(0);
+    let canFlip = true;
+    let firstFind = false;
+    let answer = '';
+    let start = 0;
+    let end = 0;
+    for (let i = 0; i < string.length; i++) {
+        if (string[i] === "<") {
+            canFlip = false;
+        } else if (string[i] === ">") {
+            canFlip = true;
+        } else {
+            if (canFlip && string[i] !== " ") {
+                info[i] = 1;
             }
         }
     }
-
-    for (let i = 0; i < matrix.length; i++) {
-        colString = "";
-        for (let j = 0; j < matrix.length; j++) {
-            colString += matrix[j][i];
-        }
-        for (const e of splitByX(colString)) {
-            if (e.includes("..")) {
-                colCnt++;
+    for (let i = 0; i < info.length;) {
+        if (info[i] === 1) {
+            if (!firstFind) {
+                firstFind = true;
+                start = i;
             }
+            i++;
+        } else {
+            if (firstFind) {
+                end = i;
+                answer += Array.from(string.slice(start, end)).reverse().join("");
+                firstFind = false;
+            }
+
+            answer += string[i];
+            i++;
         }
     }
-    console.log(rowCnt, colCnt);
+    if (firstFind) {
+        end = info.lenght;
+        answer += Array.from(string.slice(start, end)).reverse().join("");
+        firstFind = false;
+    }
+    console.log(answer);
 };
 
 const input = [];
 rl.on("line", function (line) {
     input.push(line);
 }).on("close", function () {
-    delete input;
-
-    solution(input.slice(1));
-
+    solution(input[0]);
     process.exit();
 });
