@@ -1,76 +1,106 @@
 'use strict'
-class MaxHeapTree {
-    values = []
 
-    isEmpty() {
-        return this.values.length === 0
+function PriorityQueue(comparator) { //https://github.com/janogonzalez/priorityqueuejs/blob/master/index.js
+
+    this.defaultComparator = function (a, b) {
+        if (typeof a === "number" && typeof b === "number") {
+            return a - b;
+        } else {
+            a = a.toString();
+            b = b.toString();
+            if (a == b) return 0;
+            return a > b ? 1 : -1;
+        }
     }
 
-    parentIndexOf(index) {
-        return Math.floor((index - 1) / 2)
+    const _comparator = comparator || this.defaultComparator;
+    const _elements = [];
+
+    const _compare = function (a, b) {
+        return _comparator(_elements[a], _elements[b]);
     }
 
-    leftChildIndexOf(index) {
-        return index * 2 + 1
+    const _swap = function (a, b) {
+        const tmp = _elements[a];
+        _elements[a] = _elements[b];
+        _elements[b] = tmp;
     }
 
-    rightChildIndexOf(index) {
-        return index * 2 + 2
+
+
+    this.getSize = function () {
+        return _elements.length;
+    }
+    this.isEmpty = function () {
+        return this.getSize() === 0;
     }
 
-    push(n) {
-        let index = this.values.length
-        this.values.push(n)
-        while (index !== 0) {
-            const parentIndex = this.parentIndexOf(index)
-            if (this.values[index] <= this.values[parentIndex]) {
-                break
-            } else {
-                this.swapValue(parentIndex, index)
-                index = parentIndex
+    this.peek = function () {
+        try {
+            return _elements[0];
+        } catch (e) {
+            throw new Error("queue is empty");
+        }
+    }
+
+    this.dequeue = function () {
+        if (this.getSize() === 0) {
+            throw new Error("Empty queue");
+        }
+
+        let first = this.peek();
+        let last = _elements.pop(); // 1개 뺌
+        let size = this.getSize();
+
+        if (size === 0) return last; // 1개 빼서 0개이면 마지막으로 뺏던 last반환
+
+        _elements[0] = last;
+        let current = 0;
+
+        while (current < size) {
+            let largest = current;
+            let left = (2 * current) + 1;
+            let right = (2 * current) + 2;
+
+            if (left < size && _compare(left, largest) >= 0) {
+                largest = left;
             }
-        }
-    }
 
-    pop() {
-        if (this.values.length === 1) {
-            return this.values.pop()
-        }
-
-        const retValue = this.values[0]
-        this.values[0] = this.values.pop()
-        let index = 0
-        while (index < this.values.length - 1) {
-            const leftChildIndex = this.leftChildIndexOf(index)
-            const rightChildIndex = this.rightChildIndexOf(index)
-            if (this.getValueOrMin(leftChildIndex) <= this.getValueOrMin(index) &&
-                this.getValueOrMin(rightChildIndex) <= this.getValueOrMin(index)) {
-                break
-            } else if (this.getValueOrMin(leftChildIndex) < this.getValueOrMin(rightChildIndex)) {
-                this.swapValue(index, rightChildIndex)
-                index = rightChildIndex
-            } else {
-                this.swapValue(index, leftChildIndex)
-                index = leftChildIndex
+            if (right < size && _compare(right, largest) >= 0) {
+                largest = right;
             }
+
+            if (largest === current) break;
+
+            _swap(largest, current);
+            current = largest;
         }
-        return retValue
+
+        return first;
     }
 
-    swapValue(index1, index2) {
-        const tmp = this.values[index1]
-        this.values[index1] = this.values[index2]
-        this.values[index2] = tmp
+    this.enqueue = function (elem) {
+        let size = _elements.push(elem);
+        let current = size - 1;
+
+        while (current > 0) {
+            const parent = Math.floor((current - 1) / 2);
+            if (_compare(current, parent) <= 0) break;
+            _swap(parent, current);
+            current = parent;
+        }
+
+        return size;
     }
 
-    getValueOrMin(idx) {
-        if (this.values.length <= idx) {
-            return -1
-        }
-        return this.values[idx]
+    this.forEach = function (fn) {
+        return _elements.forEach(fn);
+    }
+
+    this.getArray = function () {
+        return _elements.slice();
     }
 }
-
 
 const readline = require("readline");
 const {
@@ -81,24 +111,24 @@ const rl = readline.createInterface({
     output: process.stdout,
 });
 
-const solution = (input) => {
-    const q = new MaxHeapTree();
-    let answer = "";
-
-    input.forEach(element => {
-        element = parseInt(element);
-        if (element > 0) {
-            q.push(element);
-        } else {
-            if (q.isEmpty()) {
-                answer += "0\n";
-            } else {
-                answer += `${q.pop()}\n`;
-            }
+const solution = function (input) {
+    const n = parseInt(input[0]);
+    const arr = input[1].split(" ").map(elem => parseInt(elem));
+    const pq = new PriorityQueue();
+    let score = 0;
+    arr.forEach(
+        a => {
+            pq.enqueue(a);
         }
-    });
-    console.log(answer);
+    );
+    while (pq.getSize() > 1) {
+        const max1 = pq.dequeue();
+        const max2 = pq.dequeue();
 
+        pq.enqueue(max1 + max2);
+        score += max1 * max2;
+    }
+    console.log(score);
 };
 
 
@@ -106,6 +136,6 @@ const input = [];
 rl.on("line", function (line) {
     input.push(line);
 }).on("close", function () {
-    solution(input.slice(1));
+    solution(input);
     process.exit();
 });
