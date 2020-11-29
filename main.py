@@ -1,49 +1,74 @@
 'use strict'
+class MaxHeapTree {
+    values = []
 
-function MinHeap() {
-    this.heap = [0];
-
-    this.insert = (v) => {
-        this.heap.push(v);
-        let p = this.heap.length - 1;
-        while (p > 1 && this.heap[Math.floor(p / 2)] > this.heap[p]) {
-            let tmp = this.heap[Math.floor(p / 2)];
-            this.heap[Math.floor(p / 2)] = this.heap[p];
-            this.heap[p] = tmp;
-            p = Math.floor(p / 2);
-        }
-    };
-    this.getLength = () => {
-        return this.heap.length;
+    isEmpty() {
+        return this.values.length === 0
     }
-    this.delete = () => {
-        if (this.heap.length - 1 < 1) {
-            return 0;
-        }
-        let deletedItem = this.heap[1];
 
-        this.heap[1] = this.heap[this.heap.length - 1];
-        this.heap.pop();
+    parentIndexOf(index) {
+        return Math.floor((index - 1) / 2)
+    }
 
-        let p = 1;
-        while (p * 2 < this.heap.length) {
-            let min = this.heap[p * 2];
-            let minP = p * 2;
-            if (p * 2 + 1 < this.heap.length && min > this.heap[p * 2 + 1]) {
-                min = this.heap[p * 2 + 1];
-                minP = p * 2 + 1;
+    leftChildIndexOf(index) {
+        return index * 2 + 1
+    }
+
+    rightChildIndexOf(index) {
+        return index * 2 + 2
+    }
+
+    push(n) {
+        let index = this.values.length
+        this.values.push(n)
+        while (index !== 0) {
+            const parentIndex = this.parentIndexOf(index)
+            if (this.values[index] <= this.values[parentIndex]) {
+                break
+            } else {
+                this.swapValue(parentIndex, index)
+                index = parentIndex
             }
-            if (this.heap[p] < min) {
-                break;
-            }
-
-            let tmp = this.heap[p];
-            this.heap[p] = this.heap[minP];
-            this.heap[minP] = tmp;
-            p = minP;
         }
-        return deletedItem;
-    };
+    }
+
+    pop() {
+        if (this.values.length === 1) {
+            return this.values.pop()
+        }
+
+        const retValue = this.values[0]
+        this.values[0] = this.values.pop()
+        let index = 0
+        while (index < this.values.length - 1) {
+            const leftChildIndex = this.leftChildIndexOf(index)
+            const rightChildIndex = this.rightChildIndexOf(index)
+            if (this.getValueOrMin(leftChildIndex) <= this.getValueOrMin(index) &&
+                this.getValueOrMin(rightChildIndex) <= this.getValueOrMin(index)) {
+                break
+            } else if (this.getValueOrMin(leftChildIndex) < this.getValueOrMin(rightChildIndex)) {
+                this.swapValue(index, rightChildIndex)
+                index = rightChildIndex
+            } else {
+                this.swapValue(index, leftChildIndex)
+                index = leftChildIndex
+            }
+        }
+        return retValue
+    }
+
+    swapValue(index1, index2) {
+        const tmp = this.values[index1]
+        this.values[index1] = this.values[index2]
+        this.values[index2] = tmp
+    }
+
+    getValueOrMin(idx) {
+        if (this.values.length <= idx) {
+            return -1
+        }
+        return this.values[idx]
+    }
 }
 
 
@@ -57,22 +82,25 @@ const rl = readline.createInterface({
 });
 
 const solution = (input) => {
-    const q = new MinHeap();
+    const q = new MaxHeapTree();
     let answer = "";
+
     input.forEach(element => {
         element = parseInt(element);
         if (element > 0) {
-            q.insert(element);
+            q.push(element);
         } else {
-            if (q.getLength() === 0) {
+            if (q.isEmpty()) {
                 answer += "0\n";
             } else {
-                answer += `${q.delete()}\n`;
+                answer += `${q.pop()}\n`;
             }
         }
     });
     console.log(answer);
+
 };
+
 
 const input = [];
 rl.on("line", function (line) {
