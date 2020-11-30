@@ -6,16 +6,40 @@ const rl = readline.createInterface({
     output: process.stdout,
 });
 
-const solution = function (input) {
-    const s = parseInt(input[0]);
-    let curr = 1;
-    let sum = curr;
-    while (sum <= s) {
-        curr++;
-        sum += curr;
+const binarySearch = (array, target, start, end) => {
+    let mid = -1;
+    while (start <= end) {
+        mid = Math.floor((start + end) / 2);
+        if (array[mid] === target) {
+            return mid;
+        } else if (array[mid] > target) {
+            end = mid - 1;
+        } else {
+            start = mid + 1;
+        }
     }
-    console.log(curr - 1);
+    return -1;
+}
 
+const solution = function (input) {
+    const n = parseInt(input[0]);
+    const A = input[1].split(" ").map(e => parseInt(e));
+    const m = parseInt(input[2]);
+    const B = input[3].split(" ").map(e => parseInt(e));
+    let ans = '';
+    A.sort((a, b) => a - b);
+
+    B.forEach(
+        (elem, idx) => {
+            if (binarySearch(A, elem, 0, n - 1) !== -1) {
+                ans += idx === m - 1 ? '1' : "1\n";
+            } else {
+                ans += idx === m - 1 ? '0' : '0\n';
+            }
+        }
+    );
+
+    console.log(ans);
 };
 
 
