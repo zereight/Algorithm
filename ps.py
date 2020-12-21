@@ -1,41 +1,36 @@
 import sys
-from collections import deque
-from itertools import combinations
-import copy
+import heapq
+INF = 1e9
 input = sys.stdin.readline
-
-n, m = map(int, input().rstrip().split(" "))
-board = []
-virusPos = []
-nothingPos = []
-direction = [
-    []
-]
-for row in range(n):
-    board.append(input().rstrip().split(" "))
-    for col in range(m):
-        if(board[row][col] == 0):
-            nothingPos.append([row, col])
-        elif(board[row][col] == 1):
-            virusPos.append([row, col])
+a, b = map(int, input().rstrip().split())
+n, m = map(int, input().rstrip().split())
+adj = [[] for _ in range(n + 1)]
+distance = [INF] * (n + 1)
+visited = [False] * (n + 1)
+for _ in range(m):
+    c1, c2 = map(int, input().rstrip().split())
+    adj[c1].append(c2)
+    adj[c2].append(c1)
 
 
-def bfs(wallPos, board, virusPos):
-    newBoard = copy.deepcopy(board)
-    for x, y in wallPos:
-        newBoard[x][y] = 1
-    zeroCnt = n*m - len(wallPos) - len(virusPos)
-    q = deque(virusPos)
-    while(q):
-        curr_x, curr_y = q.popleft()
-        for a, b in direction:
-            nx, ny = curr_x+a, curr_y+b
-            if(nx >= 0 and ny >= 0 and nx < n and ny < m):
-                if(board[nx][ny] == 0):
-                    q.append([nx, ny])
-                    board[nx][ny] = 2
-                    zeroCnt -= 1
+def dijkstra(start):
+    q = []
+    heapq.heappush(q, (0, start))
+    distance[start] = 0
+    visited[start] = True
+    while q:
+        dist, now = heapq.heappop(q)
+        if distance[now] < dist:
+            continue
+        for i in adj[now]:
+            cost = dist + 1
+            if cost < distance[i]:
+                distance[i] = cost
+                heapq.heappush(q, (cost, i))
 
 
-for wallPos in combinations(nothingPos, 3):
-    pass
+dijkstra(a)
+if distance[b] == INF:
+    print(-1)
+else:
+    print(distance[b])
