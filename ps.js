@@ -1,51 +1,31 @@
 /**
- * @param {string} s
- * @return {number}
+ * @param {string[]} strs
+ * @return {string}
  */
 
-const getValue = (previousChr, currChr) => {
-    switch(currChr){
-        case 'I':
-            return 1;
-        case 'V':
-            if(previousChr==='I'){
-                return 4-1;
-            }
-            return 5;
-        case 'X':
-            if(previousChr==='I'){
-                return 9-1;
-            }
-            return 10;
-        case 'L':
-            if(previousChr==='X'){
-                return 40-10;
-            }
-            return 50;
-        case 'C':
-            if(previousChr==='X'){
-                return 90-10;
-            }
-            return 100;
-        case 'D':
-            if(previousChr==='C'){
-                return 400-100;
-            }
-            return 500;
-        case 'M':
-            if(previousChr==='C'){
-                return 900-100;
-            }
-            return 1000;
-    }
-}
+const findMinLength = (array) =>
+	array.reduce((a, b) => (a.length < b.length ? a : b));
 
-var romanToInt = function(s) {
-    let ans = 0;
-    let prev = '';
-    for(const chr of s){
-        ans += getValue(prev, chr);
-        prev = chr;
-    }
-    return ans;
+const isSameChrOfIndex = (index, strs) => {
+	const pivot = strs[0][index];
+	for (const str of strs.slice(1)) {
+		if (str[index] !== pivot) return false;
+	}
+	return true;
+};
+
+var longestCommonPrefix = function (strs) {
+    if(strs.length === 0) return '';
+	const minLength = findMinLength(strs).length;
+	let ans = '';
+	let temp = '';
+	for (let index = 0; index < minLength; index++) {
+		if (!isSameChrOfIndex(index, strs)) {
+            break;
+			
+		}
+        temp += strs[0][index];
+        ans = ans.length < temp.length ? temp : ans;
+	}
+	return ans;
 };
