@@ -33,3 +33,4 @@ rl.on('line', function (line) {
 	solution(input);
 	process.exit();
 });
+
