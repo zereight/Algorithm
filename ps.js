@@ -1,31 +1,39 @@
 /**
- * @param {string} digits
- * @return {string[]}
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
  */
-
-var letterCombinations = function (digits) {
-	const numDict = {
-		2: ['a', 'b', 'c'],
-		3: ['d', 'e', 'f'],
-		4: ['g', 'h', 'i'],
-		5: ['j', 'k', 'l'],
-		6: ['m', 'n', 'o'],
-		7: ['p', 'q', 'r', 's'],
-		8: ['t', 'u', 'v'],
-		9: ['w', 'x', 'y', 'z'],
-	};
-
-	const ans = [];
-
-	const dfs = (deepness, currStr) => {
-		if (deepness === digits.length) return;
-		for (const chr of numDict[Array.from(digits)[deepness]]) {
-			if ((currStr + chr).length === digits.length) ans.push(currStr + chr);
-			dfs(deepness + 1, currStr + chr);
-		}
-	};
-
-	dfs(0,'');
-
-	return ans;
+/**
+ * @param {ListNode} l1
+ * @param {ListNode} l2
+ * @return {ListNode}
+ */
+ function ListNode(val, next) {
+      this.val = (val===undefined ? 0 : val)
+      this.next = (next===undefined ? null : next)
+  }
+var mergeTwoLists = function(l1, l2) {
+    const newListNode = new ListNode();
+    let tempListNode = newListNode;
+    
+    
+    while(l1&&l2){
+        if(l1.val > l2.val){
+            // tempListNode.val = l2.val;
+            tempListNode.next = l2;
+            l2 = l2.next;
+        }else{
+            // tempListNode.val = l1.val;
+            tempListNode.next = l1;
+            l1 = l1.next;
+        }
+        tempListNode = tempListNode.next;
+    }
+    
+            
+    tempListNode.next = l1 || l2;
+    
+    return newListNode.next;
 };
