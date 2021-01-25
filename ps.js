@@ -1,39 +1,30 @@
 /**
- * Definition for singly-linked list.
- * function ListNode(val, next) {
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
  *     this.val = (val===undefined ? 0 : val)
- *     this.next = (next===undefined ? null : next)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
  * }
  */
 /**
- * @param {ListNode} l1
- * @param {ListNode} l2
- * @return {ListNode}
+ * @param {TreeNode} root
+ * @return {boolean}
  */
- function ListNode(val, next) {
-      this.val = (val===undefined ? 0 : val)
-      this.next = (next===undefined ? null : next)
-  }
-var mergeTwoLists = function(l1, l2) {
-    const newListNode = new ListNode();
-    let tempListNode = newListNode;
+var isValidBST = function(root) {
     
-    
-    while(l1&&l2){
-        if(l1.val > l2.val){
-            // tempListNode.val = l2.val;
-            tempListNode.next = l2;
-            l2 = l2.next;
-        }else{
-            // tempListNode.val = l1.val;
-            tempListNode.next = l1;
-            l1 = l1.next;
+    const dfs = (currNode, lowLimit, highLimit) => {
+        
+        if(currNode === null) return true;
+        
+        if(currNode.val<=lowLimit || highLimit<=currNode.val){
+            return false;
         }
-        tempListNode = tempListNode.next;
+        
+        return dfs(currNode.right, currNode.val, highLimit) && dfs(currNode.left, lowLimit, currNode.val);
+        
+        
     }
+    return dfs(root, -Infinity, Infinity);
     
-            
-    tempListNode.next = l1 || l2;
     
-    return newListNode.next;
 };
