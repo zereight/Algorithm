@@ -1,31 +1,24 @@
-const readline = require('readline');
-const rl = readline.createInterface({
-	input: process.stdin,
-	output: process.stdout,
-});
+const sum = (arr) => arr.reduce((acc, curr)=> acc+curr, 0)
 
-const solution = function (input) {
-	const n = Number(input.shift());
-	const boxSize = input.shift().split(' ').map(Number);
-	const dp = Array.from({ length: n }, () => 1);
+const solution = (numbers, target) => {
+	let answer = 0;
 
-	boxSize.forEach((box, index) => {
-		if (index === 0) return;
-
-		for (let i = 0; i < index; i++) {
-			if (boxSize[i] < boxSize[index] && dp[index] < dp[i] + 1) {
-				dp[index] = dp[i] + 1;
+	const dfs = (depth, arr) => {
+		if(depth === numbers.length){
+			if(sum(arr) === target){
+				answer++;
 			}
+			return;
 		}
-	});
 
-	console.log(dp.reduce((a, b) => Math.max(a, b)));
-};
+		dfs(depth+1, [...arr, numbers[depth]]);
+		dfs(depth+1, [...arr, -numbers[depth]]);
+	}
 
-const input = [];
-rl.on('line', function (line) {
-	input.push(line);
-}).on('close', function () {
-	solution(input);
-	process.exit();
-});
+	dfs(0, []);
+
+	return answer;
+}
+
+console.log(solution([1,1,1,1,1],3));
+console.log(solution([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],3));
