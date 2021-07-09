@@ -1,5 +1,123 @@
-3
-5 5 4
-3 9 1
-3 2 7
-0
+const solution = (가지고있는원화, 환율) => {
+	const N번째날최대수익 = Array.from({ length: 환율.length }, () => 0);
+
+	for (let n = 1; n < 환율.length; n++) {
+		N번째날최대수익[n] = N번째날최대수익[n - 1] + (
+			환율[n] - 환율[n - 1] >= 0 ? 환율[n] - 환율[n - 1] : 0
+		);
+	}
+
+	const 마지막날 = 환율.length - 1;
+	return N번째날최대수익[마지막날] + 가지고있는원화;
+};
+
+console.log(solution(
+	1000,
+	[1200, 1000, 1100, 1200, 900, 1000, 1500, 900, 750, 1100]
+));
+
+console.log(solution(
+	1500,
+	[1500, 1400, 1300, 1200]
+));
+
+---
+
+const solution = (가진자산, 비용List) => {
+	const N층까지의_가장긴연속된층수 = Array.from({length: 비용List.length}, () => 0);
+	const temp = 가진자산;
+	const 마지막층 = N층까지의_가장긴연속된층수.length - 1;
+
+	let isFirst = false;
+
+	if(가진자산 >= 비용List[0])	{
+		N층까지의_가장긴연속된층수[0] = 1;
+	}
+
+	for(let n=1; n<비용List.length; n++){
+		if(비용List[n] <= 가진자산){ 
+			N층까지의_가장긴연속된층수[n] = isFirst ? 1 : N층까지의_가장긴연속된층수[n-1] + 1;
+
+			가진자산 -= 비용List[n];
+			isFirst = false;
+		}else{
+			N층까지의_가장긴연속된층수[n] = N층까지의_가장긴연속된층수[n-1];
+			가진자산 = temp;
+			isFirst = true;
+		}
+		
+	}
+	return N층까지의_가장긴연속된층수[마지막층]
+};
+
+----------------------------------------------------------------
+const solution = (block,board) => {
+    const [rowLen, colLen] = [board.length, board[0].length];
+
+	const countFilledRow = (newBoard) => {
+		let count = 0;
+		for(let i=0; i<rowLen; i++){
+			let isFilled = true;
+			for(let j=0; j<colLen; j++){
+				if(board[i][j] || newBoard[i][j]) continue;
+				isFilled = false;
+				break;
+			}
+			isFilled && count++;
+		}
+
+		return count;
+	}
+
+	const blockPoints = {
+		0: (x,y) => [[x,y], [x+1, y], [x+2,y]],
+		1: (x,y) => [[x,y], [x, y+1], [x,y+2]],
+		2: (x,y) => [[x,y], [x+1, y], [x+1,y+1]],
+		3: (x,y) => [[x,y+1], [x+1, y], [x+1,y+1]],
+		4: (x,y) => [[x,y], [x, y+1], [x+1,y+1]],
+		5: (x,y) => [[x,y], [x+1, y], [x,y+1]],
+	}
+
+	const isValidPoint = (x,y) => {
+		const isValidRange = 0<=x && x<rowLen && 0<=y && y<colLen;
+		if(!isValidRange) return false;
+
+		const isEmptyPoint = board[x][y] === 0;
+		if(!isEmptyPoint) return false;
+
+		return true;
+	}
+
+	const processing = (x,y) => {
+		const blockPoint = blockPoints[block](x,y);
+		if(!blockPoint.every(point => isValidPoint(point[0], point[1]))) return 0;
+		
+		const tempBoard = Array.from({length: rowLen}, () => Array.from({length: colLen}, () => 0));
+
+		blockPoint.forEach(([i,j]) => {
+			tempBoard[i][j] = 1;
+		})
+		
+		return countFilledRow(tempBoard);
+	}
+
+	let max = 0;
+
+	for(let i=0; i<rowLen; i++){
+		for(let j=0; j<colLen; j++){
+			if(board[i][j]) continue;
+			max = Math.max(max,processing(i,j));
+		}
+	}
+
+	return max;
+}
+
+console.log(solution(0, [[1,0,0,0],[1,0,0,1],[1,1,0,1],[1,1,0,1]]));
+console.log(solution(1, [[1,0,0,0],[1,0,0,1],[1,1,0,1],[1,1,0,1]]));
+console.log(solution(2, [[1,0,0,0],[1,0,0,1],[1,1,0,1],[1,1,0,1]]));
+console.log(solution(3, [[1,0,0,0],[1,0,0,1],[1,1,0,1],[1,1,0,1]]));
+console.log(solution(4, [[1,0,0,0],[1,0,0,1],[1,1,0,1],[1,1,0,1]]));
+console.log(solution(5, [[1,0,0,0],[1,0,0,1],[1,1,0,1],[1,1,0,1]]));
+
+

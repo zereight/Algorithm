@@ -1,13 +1,10 @@
-const solution = (absolutes, signs) => {
-	const answer = absolutes.reduce((acc, absolute, index) => {
-		return acc + (signs[index] ? absolute : -absolute);
-	}, 0)
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
 
-	return answer;
-}
+var removeDuplicates = function (nums) {
+	nums.splice(0, nums.length, ...new Set(nums));
+};
 
-console.log(solution(
-	[4,7,12],
-	[true,false,true]
-));
-
+console.log(removeDuplicates([1,1,2]) );
