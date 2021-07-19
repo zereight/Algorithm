@@ -1,38 +1,22 @@
-const inMessage = (name) => `${name}님이 들어왔습니다.`;
-const outMessage = (name) => `${name}님이 나갔습니다.`;
+const solution = (N, stages) => {
+  const answer = Array.from({ length: N + 1 }, () => 0);
 
-const logToString = (db, log) => {
-  const logString = [];
-  for (const logData of log) {
-    const [act, uid, _] = logData.split(" ");
+  for (let stage = 1; stage <= N; stage++) {
+    let trierAmount = 0;
+    let nonClearAmount = 0;
 
-    if (act === "Enter") {
-      logString.push(inMessage(db[uid]));
-    } else if (act === "Leave") {
-      logString.push(outMessage(db[uid]));
-    }
+    stages.forEach((currUserPos) => {
+      if (currUserPos >= stage) trierAmount++;
+      if (currUserPos === stage) nonClearAmount++;
+    });
+
+    answer[stage] = nonClearAmount / trierAmount;
   }
 
-  return logString;
+  return [...answer.entries()]
+    .slice(1)
+    .sort((a, b) => b[1] - a[1])
+    .map((e) => e[0]);
 };
 
-const solution = (record) => {
-  const db = {};
-
-  for (const data of record) {
-    const [act, uid, name] = data.split(" ");
-    if (act !== "Leave") db[uid] = name;
-  }
-
-  return logToString(db, record);
-};
-
-const dummy = [
-  "Enter uid1234 Muzi",
-  "Enter uid4567 Prodo",
-  "Leave uid1234",
-  "Enter uid1234 Prodo",
-  "Change uid4567 Ryan",
-];
-
-console.log(solution(dummy));
+console.log(solution(5, [2, 1, 2, 6, 2, 4, 3, 3]));
