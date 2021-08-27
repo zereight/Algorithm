@@ -121,3 +121,427 @@ console.log(solution(4, [[1,0,0,0],[1,0,0,1],[1,1,0,1],[1,1,0,1]]));
 console.log(solution(5, [[1,0,0,0],[1,0,0,1],[1,1,0,1],[1,1,0,1]]));
 
 
+
+///
+
+
+function preprocessingInfo(infos) {
+  const info = {};
+  infos.forEach((_info) => {
+    const [id, password] = _info.split(" ");
+
+    info[id] = password;
+  });
+
+  return info;
+}
+
+function solution(infos, actions) {
+  const answer = [];
+
+  function ok() {
+    answer.push(true);
+  }
+  function no() {
+    answer.push(false);
+  }
+
+  const parsedInfo = preprocessingInfo(infos);
+  let isLogined = false;
+  let canAddCart = false;
+
+  actions.forEach((action) => {
+    const words = action.split(" ");
+    const command = words[0];
+
+    if (command === "LOGIN") {
+      if (isLogined) {
+        no();
+      } else {
+        const id = words[1];
+        const pw = words[2];
+        const isValidUserInfo = parsedInfo[id] === pw;
+
+        if (isValidUserInfo) {
+          ok();
+          isLogined = true;
+        } else {
+          no();
+        }
+      }
+    }
+
+    if (command === "ADD") {
+      if (isLogined) {
+        ok();
+        canAddCart = true;
+      } else {
+        no();
+      }
+    }
+
+    if (command === "ORDER") {
+      if (canAddCart) {
+        ok();
+        canAddCart = false;
+      } else {
+        no();
+      }
+    }
+  });
+
+  return answer;
+}
+
+console.log(
+  solution(
+    ["kim password", "lee abc"],
+    [
+      "ADD 30",
+      "LOGIN kim abc",
+      "LOGIN lee password",
+      "LOGIN kim password",
+      "LOGIN kim password",
+      "LOGIN lee abc",
+      "ADD 30",
+      "ORDER",
+      "ORDER",
+      "ADD 40",
+      "ADD 50",
+    ]
+  )
+);
+
+///
+
+const GRADE_TYPE = [
+  "A+",
+  "A0",
+  "A-",
+  "B+",
+  "B0",
+  "B-",
+  "C+",
+  "C0",
+  "C-",
+  "D+",
+  "D0",
+  "D-",
+  "F",
+];
+
+const GRADE_TABLE = GRADE_TYPE.reduce((acc, curr, index) => {
+  return { ...acc, [curr]: GRADE_TYPE.length - index };
+}, {});
+
+function preprocessingGrades(grades) {
+  const info = grades.reduce((acc, curr, index) => {
+    const [code, grade] = curr.split(" ");
+
+    if (acc[code]) {
+      const prevGradeScore = GRADE_TABLE[acc[code][0]];
+      const currGradeScore = GRADE_TABLE[grade];
+
+      if (prevGradeScore < currGradeScore) {
+        acc[code] = [grade, index];
+      }
+    } else {
+      acc[code] = [grade, index];
+    }
+
+    return acc;
+  }, {});
+
+  return info;
+}
+
+function solution(grades) {
+  const preprocessedGrades = preprocessingGrades(grades);
+
+  const sortedGrades = Object.entries(preprocessedGrades)
+    .map(([code, gradeInfo]) => [code, gradeInfo[0], gradeInfo[1]])
+    .sort((a, b) => {
+      const [_, gradeA, indexA] = a;
+      const [__, gradeB, indexB] = b;
+
+      const scoreA = GRADE_TABLE[gradeA];
+      const scoreB = GRADE_TABLE[gradeB];
+
+      if (scoreA < scoreB) {
+        return 1;
+      } else {
+        if (scoreA === scoreB) {
+          if (indexA < indexB) {
+            return -1;
+          } else {
+            return 1;
+          }
+        }
+
+        return -1;
+      }
+    });
+
+  return sortedGrades.map((grade) => `${grade[0]} ${grade[1]}`);
+}
+
+console.log(
+  solution([
+    "DS7651 A0",
+    "CA0055 D+",
+    "AI5543 C0",
+    "OS1808 B-",
+    "DS7651 B+",
+    "AI0001 F",
+    "DB0001 B-",
+    "AI5543 D+",
+    "DS7651 A+",
+    "OS1808 B-",
+  ])
+);
+
+console.log(
+  solution([
+    "DM0106 D-",
+    "PL6677 B+",
+    "DM0106 B+",
+    "DM0106 B+",
+    "PL6677 C0",
+    "GP0000 A0",
+  ])
+);
+
+
+///
+
+function solution(word, cards) {
+  const chrPoints = Array.from(word).reduce((acc, curr) => {
+    acc[curr] = [];
+    return acc;
+  }, {});
+
+  for (let i = 0; i < cards.length; i++) {
+    for (let j = 0; j < cards[0].length; j++) {
+      if (chrPoints[cards[i][j]]) {
+        chrPoints[cards[i][j]].push([i, j]);
+      }
+    }
+  }
+
+  const pointsTracks = {};
+
+  function dfs(
+    remainChrPoints,
+    accWord,
+    targetChr,
+    beforeSelectedPointX,
+    beforeSelectedPointY
+  ) {
+    if (accWord === word) {
+      pointsTracks[
+        beforeSelectedPointX
+          .map((x, index) => {
+            return `(${x}, ${beforeSelectedPointY[index]})`;
+          })
+          .sort()
+      ] = true;
+
+      return;
+    }
+
+    const newChrPoints = JSON.parse(JSON.stringify(remainChrPoints));
+
+    newChrPoints[targetChr].forEach((point, index) => {
+      if (
+        !beforeSelectedPointX.includes(point[0]) &&
+        !beforeSelectedPointY.includes(point[1])
+      ) {
+        const _remainChrPoints = JSON.parse(JSON.stringify(remainChrPoints));
+        _remainChrPoints[targetChr].splice(index, 1);
+
+        const _accWord = accWord + targetChr;
+        const _targetChr = word[_accWord.length];
+        const _beforeSelectedPointX = [...beforeSelectedPointX, point[0]];
+        const _beforeSelectedPointY = [...beforeSelectedPointY, point[1]];
+
+        dfs(
+          _remainChrPoints,
+          _accWord,
+          _targetChr,
+          _beforeSelectedPointX,
+          _beforeSelectedPointY
+        );
+      }
+    });
+  }
+
+  dfs(chrPoints, "", word[0], [], []);
+
+  return Object.keys(pointsTracks).length;
+}
+
+console.log(solution("APPLE", ["LLZKE", "LCXEA", "CVPPS", "EAVSR", "FXPFP"]));
+console.log(solution("BAB", ["ZZBZ", "BAZB", "XBXB", "XBAX"]));
+console.log(solution("BABXZ", ["ZZBZ", "BAZB", "XBXB", "XBAX"]));
+
+///
+
+-- 코드를 입력하세요
+SELECT EMPLOYEE_ID, CASE WHEN COUNT(CAR_ID) >= 4 THEN "최우수 사원" WHEN COUNT(CAR_ID) BETWEEN 2 AND 3 THEN "우수 사원" WHEN COUNT(CAR_ID) >= 1 THEN "일반 사원" END "분류 상태", COUNT(CAR_ID) as COUNT FROM SELLINGS GROUP BY EMPLOYEE_ID;
+
+
+/// 1번
+
+function preprocessingInfo(infos) {
+  const info = {};
+  infos.forEach((_info) => {
+    const [id, password] = _info.split(" ");
+
+    info[id] = password;
+  });
+
+  return info;
+}
+
+const COMMAND = {
+  LOGIN: "LOGIN",
+  ADD: "ADD",
+  ORDER: "ORDER",
+};
+
+function solution(infos, actions) {
+  const answer = [];
+
+  const parsedInfo = preprocessingInfo(infos);
+  let isLogined = false;
+  let canAddCart = false;
+
+  function ok() {
+    answer.push(true);
+  }
+  function no() {
+    answer.push(false);
+  }
+
+  function allowLogin() {
+    ok();
+    isLogined = true;
+  }
+
+  function allowAdd() {
+    ok();
+    canAddCart = true;
+  }
+
+  function allowOrder() {
+    ok();
+    canAddCart = false;
+  }
+
+  actions.forEach((action) => {
+    const words = action.split(" ");
+    const command = words[0];
+
+    if (command === COMMAND.LOGIN) {
+      const id = words[1];
+      const pw = words[2];
+      const isValidUserInfo = parsedInfo[id] === pw;
+
+      (!isLogined && isValidUserInfo ? allowLogin : no)();
+    }
+
+    if (command === COMMAND.ADD) {
+      (isLogined ? allowAdd : no)();
+    }
+
+    if (command === COMMAND.ORDER) {
+      (canAddCart ? allowOrder : no)();
+    }
+  });
+
+  return answer;
+}
+
+
+///
+
+function deepCopy(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+function initChrPoints(word, cards) {
+  const chrPoints = Array.from(word).reduce((acc, curr) => {
+    acc[curr] = [];
+    return acc;
+  }, {});
+
+  for (let i = 0; i < cards.length; i++) {
+    for (let j = 0; j < cards[0].length; j++) {
+      if (chrPoints[cards[i][j]]) {
+        chrPoints[cards[i][j]].push([i, j]);
+      }
+    }
+  }
+
+  return chrPoints;
+}
+
+function solution(word, cards) {
+  const chrPoints = initChrPoints(word, cards);
+
+  const pointsTracks = {};
+
+  function createUniquePointTracks(beforeSelectedPointX, beforeSelectedPointY) {
+    return beforeSelectedPointX
+      .map((x, index) => {
+        return `(${x}, ${beforeSelectedPointY[index]})`;
+      })
+      .sort();
+  }
+
+  function dfs(
+    remainChrPoints,
+    accWord,
+    targetChr,
+    beforeSelectedPointX,
+    beforeSelectedPointY
+  ) {
+    if (accWord === word) {
+      pointsTracks[
+        createUniquePointTracks(beforeSelectedPointX, beforeSelectedPointY)
+      ] = true;
+
+      return;
+    }
+
+    const newChrPoints = deepCopy(remainChrPoints);
+
+    newChrPoints[targetChr].forEach((point, index) => {
+      const isValidPoint =
+        !beforeSelectedPointX.includes(point[0]) &&
+        !beforeSelectedPointY.includes(point[1]);
+
+      if (!isValidPoint) return;
+
+      const _remainChrPoints = deepCopy(remainChrPoints);
+      _remainChrPoints[targetChr].splice(index, 1);
+
+      const _accWord = accWord + targetChr;
+      const _targetChr = word[_accWord.length];
+      const _beforeSelectedPointX = [...beforeSelectedPointX, point[0]];
+      const _beforeSelectedPointY = [...beforeSelectedPointY, point[1]];
+
+      dfs(
+        _remainChrPoints,
+        _accWord,
+        _targetChr,
+        _beforeSelectedPointX,
+        _beforeSelectedPointY
+      );
+    });
+  }
+
+  dfs(chrPoints, "", word[0], [], []);
+
+  return Object.keys(pointsTracks).length;
+}
